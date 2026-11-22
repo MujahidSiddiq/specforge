@@ -14,6 +14,8 @@ Version 0.2.1: fixes the command-line and input-folder bugs of 0.2.0.
 - Entry points: `START-HERE.md`, `AGENTS.md`, `specforge-chat.md`.
 - Test suite in `tests/`, including the command line as a separate process.
 - 0.2.1: no batch launcher; inputs are checked before anything is written.
+- `USER-GUIDE.md` for first-time users. When a command or message changes,
+  update the guide in the same change.
 
 ## Not verified
 

@@ -10,6 +10,12 @@ The AI analyses the inputs, asks what is missing, waits for your approval
 of the outline, writes, builds and waits for your approval of the result.
 specforge holds no project data: every design has its own project folder.
 
+## New to specforge?
+
+Follow the [user guide](USER-GUIDE.md). It goes step by step from
+installation to the final PDF, with a small example, for code, cowork and
+chat assistants. The rest of this page is a short reference.
+
 ## Choose your AI
 
 | Your AI | Read |

@@ -13,6 +13,11 @@ documents, a minor version for new features, a patch version for fixes.
   cmd.exe acted on the arguments before the launcher started, so it could
   not be made safe. Projects of 0.2.0 need no change.
 
+### Added
+
+- `USER-GUIDE.md`: step-by-step guide for first-time users, linked from
+  the README.
+
 ### Fixed
 
 - A value with `&` or `|` ran as a command on Windows, `<` and `>`
