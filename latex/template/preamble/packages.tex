@@ -1,0 +1,31 @@
+% specforge -- package loading. Engine: LuaLaTeX.
+% Options that depend on the style (paper, margins, PDF properties) are set
+% in the generated build/sf-setup.tex with \geometry and \hypersetup.
+\usepackage{geometry}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\ifsfBodyRaggedRight
+  \usepackage[document]{ragged2e}
+\else
+  \usepackage{ragged2e}
+\fi
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{adjustbox}
+\usepackage{varwidth}
+\usepackage{tikz}
+\usepackage{tikz-timing}
+\usepackage{hyperref}
+\usepackage{bookmark}

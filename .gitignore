@@ -1,0 +1,8 @@
+# generated output of project builds and packaging
+build/
+/dist/
+*.zip
+
+# never publish personal or local assistant settings
+.claude/settings.local.json
+.env

@@ -1,0 +1,24 @@
+% specforge -- title page (colour-guide.md Sections 5.8 and 10): restrained,
+% neutral text, one accent rule as the only graphical marker.
+\begin{titlepage}
+\thispagestyle{empty}
+\RaggedRight
+\vspace*{\sfTitlePageTopSpaceMm mm}
+
+{\color{\sfTitlePageRuleColour}\rule{\sfTitlePageRuleWidthMm mm}{\sfTitlePageRuleThicknessPt pt}}
+
+\vspace{9mm}
+{\headingfont\fontsize{\sfTitlePageTitleSizePt}{\sfTitlePageTitleLeadingPt}\selectfont\color{\sfTitlePageTitleColour}\DocTitle\par}
+
+\vspace{4mm}
+{\fontsize{\sfTitlePageSubtitleSizePt}{\sfTitlePageSubtitleLeadingPt}\selectfont\color{\sfTitlePageSubtitleColour}\DocSubtitle\par}
+
+\vfill
+
+{\tblfont
+\begin{tabular}{@{}>{\color{\sfTitlePageFieldLabelColour}}l@{\hspace{12mm}}l@{}}
+\input{build/sf-titlefields}
+\end{tabular}\par}
+
+\vspace{12mm}
+\end{titlepage}

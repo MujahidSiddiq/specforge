@@ -1,0 +1,25 @@
+% specforge -- table styling (colour-guide.md Sections 5.2 and 11).
+%   Header row : header fill, bold text, outer rule below
+%   Body rows  : page background, thin row rules, no vertical rules
+
+\renewcommand{\arraystretch}{\sfTablesRowStretch}
+\setlength{\tabcolsep}{\sfTablesColumnSepPt pt}
+
+% Ragged-right paragraph columns
+\newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+% Header cell, header row start, and rules
+\ifsfTablesHeaderBold
+  \newcommand{\thd}[1]{\textbf{#1}}
+\else
+  \newcommand{\thd}[1]{#1}
+\fi
+\newcommand{\tblheadrow}{\rowcolor{\sfTablesHeaderFill}}
+\newcommand{\tbltoprule}{\arrayrulecolor{\sfTablesOuterRuleColour}\specialrule{\sfTablesOuterRulePt pt}{0pt}{0pt}}
+\newcommand{\tblheadrule}{\arrayrulecolor{\sfTablesOuterRuleColour}\specialrule{\sfTablesOuterRulePt pt}{0pt}{0pt}}
+\newcommand{\tblrowrule}{\arrayrulecolor{\sfTablesRowRuleColour}\specialrule{\sfTablesRowRulePt pt}{0pt}{0pt}}
+\newcommand{\tblbottomrule}{\arrayrulecolor{\sfTablesOuterRuleColour}\specialrule{\sfTablesOuterRulePt pt}{0pt}{0pt}}
+
+% Table text size
+\newcommand{\tblfont}{\fontsize{\sfTablesFontSizePt}{\sfTablesLeadingPt}\selectfont}

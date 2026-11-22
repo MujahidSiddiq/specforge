@@ -1,0 +1,36 @@
+% specforge -- reusable commands.
+
+% Signal, parameter and module names: monospaced, underscores allowed as typed.
+%   \sig{data_valid}   \param{DEPTH}   \module{top_unit}
+\NewDocumentCommand{\sig}{m}{\texttt{\detokenize{#1}}}
+\NewDocumentCommand{\param}{m}{\texttt{\detokenize{#1}}}
+\NewDocumentCommand{\module}{m}{\texttt{\detokenize{#1}}}
+
+% Marker for information that is not yet confirmed.
+\NewDocumentCommand{\pending}{}{\textcolor{\sfCalloutsPendingColour}{\textbf{\sfCalloutsPendingLabel}}}
+
+% OPEN POINT callout (colour-guide.md Section 5.3, warning treatment): fill
+% and left bar in the warning colours; the label carries the meaning, so the
+% callout stays readable in greyscale. Every open point is also listed in the
+% chapter on constraints, assumptions and limitations.
+\NewDocumentCommand{\openpoint}{m}{%
+  \par\medskip\noindent
+  \begin{tikzpicture}
+    \node[fill=\sfCalloutsOpenPointFill, inner xsep=9pt, inner ysep=7pt, anchor=north west,
+          text width=\linewidth-24pt, align=flush left, text=textprimary,
+          font=\normalsize] (op)
+      {\RaggedRight\textcolor{\sfCalloutsOpenPointLabelColour}{\textbf{\sfCalloutsOpenPointLabel}}\par\smallskip #1};
+    \draw[\sfCalloutsOpenPointBarColour, line width=\sfCalloutsOpenPointBarWidthPt pt]
+      (op.north west) -- (op.south west);
+  \end{tikzpicture}\par\medskip}
+
+% Highlighted statement (a key rule), centred in a light box.
+\NewDocumentCommand{\sfnote}{m}{%
+  \begin{center}\setlength{\fboxsep}{7pt}%
+    \colorbox{\sfCalloutsNoteFill}{\parbox{\sfCalloutsNoteWidthFraction\linewidth}{\centering #1}}%
+  \end{center}}
+
+% Cross-reference helpers
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}

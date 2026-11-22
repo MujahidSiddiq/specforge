@@ -1,0 +1,35 @@
+% =============================================================================
+% specforge -- main document.
+% Copied to <project>/build/main.tex by the build and compiled from
+% the project folder with -output-directory=build. Every \input path below is
+% relative to the project folder. Do not edit the copy in build/.
+%
+% Generated files (build/):
+%   sf-config    every style value as a macro
+%   sf-metadata  document information from project.md
+%   sf-class     \documentclass line
+%   sf-setup     geometry, colours, fonts, captions, PDF properties
+%   sf-titlefields, sf-front, sf-body   title-page fields, front matter, chapters
+% Static files (build/sf/, copied from latex/template/preamble and latex/tikz):
+%   packages, typography, tables, tikz, macros, titlepage, frontmatter
+% =============================================================================
+\input{build/sf-config}
+\input{build/sf-metadata}
+\input{build/sf-class}
+\input{build/sf/packages}
+\input{build/sf-setup}
+\input{build/sf/typography}
+\input{build/sf/tables}
+\input{build/sf/tikz}
+\input{build/sf/macros}
+
+\begin{document}
+
+\pagenumbering{\sfPageFrontMatterNumbering}
+\input{build/sf/titlepage}
+\input{build/sf/frontmatter}
+
+\pagenumbering{\sfPageBodyNumbering}
+\input{build/sf-body}
+
+\end{document}

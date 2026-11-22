@@ -1,0 +1,18 @@
+% specforge -- front matter after the title page: document information and
+% revision history (build/sf-front.tex, generated from project.md and
+% revision-history.md), then the contents and optional lists.
+\input{build/sf-front}
+\ifsfFrontMatterShareOnePage\else
+  \clearpage
+\fi
+\ifsfFrontMatterContents
+  \tableofcontents
+  \markboth{\contentsname}{}   % header in normal case, not capitals
+\fi
+\ifsfFrontMatterListOfFigures
+  \listoffigures
+\fi
+\ifsfFrontMatterListOfTables
+  \listoftables
+\fi
+\clearpage

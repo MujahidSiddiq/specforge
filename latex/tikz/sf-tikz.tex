@@ -1,0 +1,132 @@
+% =============================================================================
+% specforge -- TikZ style library for block diagrams and timing diagrams.
+% colour-guide.md Sections 5.4, 5.7, 12 and 13. Colours and line widths come
+% from build/sf-config.tex (styles/style-defaults.md, groups diagrams and
+% timing); shapes and arrow tips are fixed here.
+%
+% Block diagrams
+%   boundary      top-level module boundary            block     functional block
+%   ifgroup       interface-group box                  port      port square on a boundary
+%   wire          plain connection                     sigarrow  connection with arrow
+%   ctrl/ctrlarrow  control signal (thin)              data/dataarrow  data or state (thick)
+%   bundle/bundlearrow  signal bundle                  hlarrow   highlighted path (label it!)
+%   junction, djunction  wire junctions (thin, thick)  zoomline  zoom guide (dashed)
+%   siglabel  signal name     blockname / modname  block / module name
+%   blocksub  block sub-label grouptitle           group title     widthlabel  bus width
+% Buffer and pointer illustrations
+%   entry, entryhl (highlighted), entrydim (invalid), entrywarn (warning; label it)
+%   ptrarrow  pointer arrow   rangebrace  brace under a range of entries
+% Timing diagrams (tikz-timing)
+%   style sfwave on the tikztimingtable; \wavecycles{n} draws the cycle grid
+%   and numbers, \wavenote{first}{last}{text} adds a note under cycles.
+%   One clock cycle is two timing units wide; the clock row is [sfclock]4{HL}.
+%   Ragged-right text distorts tikz-timing tables: the build wraps every
+%   figure named fig-wave-* or fig-timing-* in justified text.
+% =============================================================================
+\usetikzlibrary{arrows.meta,calc,positioning,patterns,backgrounds,
+                decorations.pathreplacing}
+
+% ---- Timing diagrams ----------------------------------------------------------
+% Font of size #1 pt with 1.2 x leading.
+\newcommand{\sfsize}[1]{\fontsize{#1}{\fpeval{1.2*(#1)}}\selectfont}
+\newcommand{\wavefont}{\ttfamily\sfsize{\sfTimingLabelSizePt}}
+\tikzset{
+  sfwave/.style={
+    xscale=\sfTimingXScale, yscale=\sfTimingYScale,
+    line width=\sfTimingLinePt pt, color=\sfTimingSignalColour,
+    timing/slope=\sfTimingSlope,
+    timing/rowdist=2,
+    timing/name/.style={font=\wavefont, text=\sfTimingSignalColour},
+    timing/d/text/.style={font=\wavefont, text=\sfTimingSignalColour},
+    timing/d/background/.style={fill=bgpage},
+    timing/u/.style={draw=\sfTimingClockColour},
+    timing/u/background/.style={pattern=north east lines,
+                                pattern color=\sfTimingUndefinedPatternColour},
+  },
+  % Row option for the clock: [sfclock]4{HL}
+  sfclock/.style={color=\sfTimingClockColour},
+  wavecycle/.style={font=\sfsize{\sfTimingLabelSizePt},
+                    text=textsecondary, inner sep=1pt},
+  wavenote/.style={font=\sfsize{\sfTimingLabelSizePt},
+                   text=textprimary, inner sep=1pt, align=center},
+}
+
+% Cycle grid and cycle numbers. #1 = number of cycles shown.
+\newcommand{\wavecycles}[1]{%
+  \begin{scope}[on background layer]
+    \foreach \c in {0,...,#1} {
+      \draw[\sfTimingGridColour, line width=\sfTimingGridLinePt pt]
+        (2*\c,1.45) -- (2*\c,-2*\nrows+1.75);
+    }
+  \end{scope}
+  \foreach \c in {1,...,#1} {
+    \node[wavecycle] at (2*\c-1,1.85) {\the\numexpr\c-1\relax};
+  }
+  \node[wavecycle, anchor=east] at (-0.35,1.85) {cycle};
+}
+
+% Text note under the waveform. #1 = first cycle, #2 = last cycle, #3 = text.
+\newcommand{\wavenote}[3]{%
+  \node[wavenote, anchor=north] at (#1+#2+1,-2*\nrows+1.6) {#3};
+}
+
+% ---- Block diagrams -----------------------------------------------------------
+\tikzset{
+  boundary/.style={draw=\sfDiagramsBoundaryDraw, fill=\sfDiagramsBoundaryFill,
+                   line width=\sfDiagramsBoundaryLinePt pt},
+  block/.style={draw=\sfDiagramsBlockDraw, fill=\sfDiagramsBlockFill,
+                line width=\sfDiagramsBlockLinePt pt, rectangle},
+  ifgroup/.style={draw=\sfDiagramsGroupDraw, fill=\sfDiagramsGroupFill,
+                  line width=\sfDiagramsGroupLinePt pt,
+                  rounded corners=\sfDiagramsGroupCornerRadiusPt pt},
+  wire/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
+               line cap=round, line join=round},
+  sigarrow/.style={wire, -{Stealth[length=2.3mm,width=1.7mm]}},
+  ctrl/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsControlWirePt pt,
+               line cap=round, line join=round},
+  ctrlarrow/.style={ctrl, -{Stealth[length=2.2mm,width=1.6mm]}},
+  data/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsDataWirePt pt,
+               line join=round},
+  dataarrow/.style={data, -{Stealth[length=3.2mm,width=2.6mm]}},
+  bundle/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsBundlePt pt,
+                 line cap=butt},
+  bundlearrow/.style={bundle, -{Stealth[length=2.8mm,width=2.2mm]}},
+  hlarrow/.style={draw=\sfDiagramsHighlightColour,
+                  line width=\sfDiagramsHighlightLinePt pt, line join=round,
+                  -{Stealth[length=2.5mm,width=1.9mm]}},
+  port/.style={draw=\sfDiagramsBoundaryDraw, fill=bgpage,
+               line width=\sfDiagramsWireLinePt pt, rectangle,
+               minimum size=\sfDiagramsPortSizeMm mm, inner sep=0pt},
+  junction/.style={circle, fill=\sfDiagramsWireColour, draw=none,
+                   minimum size=\sfDiagramsJunctionSizeMm mm, inner sep=0pt},
+  djunction/.style={junction, minimum size=1.5*\sfDiagramsJunctionSizeMm mm},
+  zoomline/.style={draw=\sfDiagramsBoundaryDraw, line width=0.7pt,
+                   dash pattern=on 3pt off 2pt},
+  siglabel/.style={font=\ttfamily\sfsize{\sfDiagramsSignalLabelSizePt},
+                   text=textprimary, inner sep=1.6pt},
+  blockname/.style={font=\headingfont\sfsize{\sfDiagramsBlockNameSizePt},
+                    text=textprimary, align=center},
+  modname/.style={font=\headingfont\sfsize{\fpeval{\sfDiagramsBlockNameSizePt-1}},
+                  text=textprimary, align=center},
+  blocksub/.style={font=\sfsize{\sfDiagramsBlockSubSizePt},
+                   text=textsecondary, align=center},
+  grouptitle/.style={font=\bfseries\sfsize{\sfDiagramsGroupTitleSizePt},
+                     text=textprimary, inner sep=1.6pt},
+  widthlabel/.style={font=\sfsize{\sfDiagramsWidthLabelSizePt},
+                     text=textsecondary, inner sep=1.6pt},
+}
+
+% ---- Buffer and pointer illustrations ----------------------------------------
+\tikzset{
+  entry/.style={draw=\sfDiagramsBlockDraw, fill=bgpage,
+                line width=\sfDiagramsWireLinePt pt, rectangle,
+                minimum width=9mm, minimum height=7mm, inner sep=0pt,
+                font=\wavefont, text=textprimary},
+  entryhl/.style={entry, draw=\sfDiagramsHighlightColour, fill=accentsubtle,
+                  line width=1.2pt},
+  entrydim/.style={entry, fill=bgsubtle, draw=bordersubtle, text=textsecondary},
+  entrywarn/.style={entry, draw=warnfg, fill=warnbg, line width=1.2pt},
+  ptrarrow/.style={wire, -{Stealth[length=2.3mm,width=1.7mm]}},
+  rangebrace/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
+                     decorate, decoration={brace, amplitude=5pt, mirror}},
+}

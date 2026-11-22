@@ -1,0 +1,71 @@
+% specforge -- body text, headings, header and footer, float placement.
+% Every value is a macro from build/sf-config.tex (styles/style-defaults.md).
+
+% ---- Body text ----------------------------------------------------------------
+\linespread{\sfBodyLineSpread}
+\setlength{\parskip}{\sfBodyParagraphSkipPt pt plus 1pt minus 1pt}
+\setlength{\RaggedRightRightskip}{0pt plus 1fil}
+\setlength{\emergencystretch}{1.5em}
+\ifsfBodyHyphenation\else
+  \hyphenpenalty=10000
+  \exhyphenpenalty=10000
+\fi
+\widowpenalty=10000
+\clubpenalty=10000
+\setlist{itemsep=\sfBodyListItemSepPt pt,topsep=\sfBodyListTopSepPt pt,parsep=0pt}
+
+% ---- Headings: heading font, one accent rule under the chapter title ---------
+\ifsfPageChapterStartsNewPage\else
+  \titleclass{\chapter}{straight}
+\fi
+\titleformat{\chapter}[block]
+  {\RaggedRight\headingfont\fontsize{\sfHeadingsChapterSizePt}{\sfHeadingsChapterLeadingPt}\selectfont\color{\sfHeadingsColour}}
+  {\thechapter}{0.6em}{}
+  [\vspace{3pt}{\color{\sfHeadingsChapterRuleColour}\rule{\sfHeadingsChapterRuleWidthMm mm}{\sfHeadingsChapterRuleThicknessPt pt}}]
+\titlespacing*{\chapter}{0pt}{\sfHeadingsChapterSpaceBeforePt pt plus 4pt minus 2pt}{\sfHeadingsChapterSpaceAfterPt pt}
+
+\titleformat{\section}
+  {\RaggedRight\headingfont\fontsize{\sfHeadingsSectionSizePt}{\sfHeadingsSectionLeadingPt}\selectfont\color{\sfHeadingsColour}}
+  {\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{\sfHeadingsSectionSpaceBeforePt pt plus 3pt minus 2pt}{\sfHeadingsSectionSpaceAfterPt pt}
+
+\titleformat{\subsection}
+  {\RaggedRight\headingfont\fontsize{\sfHeadingsSubsectionSizePt}{\sfHeadingsSubsectionLeadingPt}\selectfont\color{\sfHeadingsColour}}
+  {\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{\sfHeadingsSubsectionSpaceBeforePt pt plus 2pt minus 2pt}{\sfHeadingsSubsectionSpaceAfterPt pt}
+
+\titleformat{\subsubsection}
+  {\RaggedRight\headingfont\fontsize{\sfHeadingsSubsubsectionSizePt}{\sfHeadingsSubsubsectionLeadingPt}\selectfont\color{\sfHeadingsColour}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\subsubsection}{0pt}{\sfHeadingsSubsubsectionSpaceBeforePt pt plus 2pt minus 1pt}{\sfHeadingsSubsubsectionSpaceAfterPt pt}
+
+\setcounter{secnumdepth}{\sfHeadingsNumberingDepth}
+\setcounter{tocdepth}{\sfHeadingsTocDepth}
+
+% ---- Header and footer --------------------------------------------------------
+\newcommand{\hfstyle}{\sfHeaderFooterFontSize\color{\sfHeaderFooterColour}}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancyhead[L]{\hfstyle \sfHeaderFooterHeaderLeft}
+\fancyhead[R]{\hfstyle \sfHeaderFooterHeaderRight}
+\fancyfoot[L]{\hfstyle \sfHeaderFooterFooterLeft}
+\fancyfoot[R]{\hfstyle \sfHeaderFooterFooterRight}
+\renewcommand{\headrulewidth}{\sfHeaderFooterHeaderRulePt pt}
+\renewcommand{\headrule}{{\color{\sfHeaderFooterHeaderRuleColour}\hrule width\headwidth height\headrulewidth}}
+\renewcommand{\footrulewidth}{\sfHeaderFooterFooterRulePt pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[L]{\hfstyle \sfHeaderFooterFooterLeft}%
+  \fancyfoot[R]{\hfstyle \sfHeaderFooterFooterRight}%
+  \renewcommand{\headrulewidth}{0pt}}
+
+% ---- Float placement: let figures share pages with text ----------------------
+\renewcommand{\topfraction}{\sfFiguresTopFraction}
+\renewcommand{\textfraction}{\sfFiguresTextFraction}
+\renewcommand{\floatpagefraction}{\sfFiguresFloatPageFraction}
+\setcounter{topnumber}{\sfFiguresMaxFloatsPerPage}
+\setcounter{totalnumber}{\sfFiguresMaxFloatsPerPage}
+
+% Ignore sub-point line overruns (invisible); larger ones are still reported.
+\hfuzz=0.5pt
