@@ -1,6 +1,6 @@
 {
   "name": "specforge",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Framework for writing high-level specifications of hardware designs from Markdown design information or RTL, with clarification workflow, configurable style and LaTeX PDF output.",
   "author": {
     "name": "specforge maintainers"

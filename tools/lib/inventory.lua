@@ -311,8 +311,20 @@ return function(U)
     return res
   end
 
+  function I.check_top(res, top, dir)
+    local u = res.by_name[top]
+    if u and u.kind == "module" then return end
+    if u then U.fail("the top '%s' is a %s, not a module", top, u.kind) end
+    local names = {}
+    for _, m in ipairs(res.units) do
+      if m.kind == "module" and #names < 20 then names[#names + 1] = m.name end
+    end
+    U.fail("top module '%s' not found in %s (modules there: %s)", top, dir or res.dir,
+      #names > 0 and table.concat(names, ", ") or "none")
+  end
+
   function I.markdown(res, top)
-    if not res.by_name[top] then U.fail("top module '%s' not found in %s", top, res.dir) end
+    I.check_top(res, top)
     local out = {}
     local function add(s) out[#out + 1] = s end
     local function tick(s) return "`" .. tostring(s):gsub("|", "\\|") .. "`" end

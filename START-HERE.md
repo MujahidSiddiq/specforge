@@ -35,9 +35,16 @@ Do not install software without the user's consent.
 
 | System | Command |
 |---|---|
-| Windows | `<specforge>\specforge.cmd <command> ...` (in PowerShell: `& "<specforge>\specforge.cmd" ...`) |
-| Linux, macOS | `sh "<specforge>/specforge.sh" <command> ...` |
-| any, with texlua on PATH | `texlua "<specforge>/tools/specforge.lua" <command> ...` |
+| every system | `texlua "<specforge>/tools/specforge.lua" <command> ...` |
+| Linux, macOS, when texlua is not on PATH | `sh "<specforge>/specforge.sh" <command> ...` |
+
+- On Windows run it from PowerShell or Bash. Never wrap it in `cmd /c` or a
+  batch file: cmd.exe treats `& % ^ | < >` in a value as its own commands.
+- Quote every value by the rules of your shell so that it stays plain text
+  (single quotes in PowerShell and Bash). A title from the user or from a
+  design file must never be able to become a command.
+- If `texlua` is not found, LaTeX is missing or its program folder is not
+  on PATH. Tell the user.
 
 In the guides, `specforge <command>` means that command line.
 

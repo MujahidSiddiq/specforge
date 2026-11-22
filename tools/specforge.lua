@@ -1,10 +1,11 @@
 -- specforge command line.
 --
---   texlua tools/specforge.lua <command> ...
---   specforge.cmd <command> ...           Windows
---   sh specforge.sh <command> ...         Linux, macOS
+--   texlua tools/specforge.lua <command> ...   every system
+--   sh specforge.sh <command> ...              Linux, macOS (finds texlua)
 --
 -- texlua ships with every LuaLaTeX installation: nothing else is needed.
+-- There is no .cmd launcher on purpose: cmd.exe acts on & % ^ | < > in the
+-- arguments before a batch file starts, so it could run text as a command.
 
 kpse.set_program_name("lualatex")
 
@@ -25,11 +26,12 @@ end
 local U = module("util")
 local Y = module("yaml", U)
 local C = module("colour")
-local P = module("project", U, Y)
+local I = module("inventory", U)
+local P = module("project", U, Y, I)
+local L = module("cli", U)
 local S = module("style", U, Y, C)
 local M = module("md2tex", U)
 local F = module("figcheck", U)
-local I = module("inventory", U)
 local B = module("build", U, P, S, M, F)
 local H = module("chat", U, P, I, F)
 local ROOT = U.dirname(U.normalize(here))
@@ -58,37 +60,20 @@ specforge <command> ...
   version
 ]]
 
-local FLAGS = U.set({ "figures", "no-inputs", "build", "check", "help" })
-local OPTIONS = {
-  new = U.set({ "approach", "input", "top", "notes", "title", "short", "author" }),
-  check = {}, build = U.set({ "figures" }), inventory = U.set({ "rtl", "top", "out" }),
-  ["chat-pack"] = U.set({ "no-inputs" }), unpack = {}, doctor = U.set({ "build" }),
-  bundle = U.set({ "check" }), version = {}, help = {},
+local COMMANDS = {
+  new = { min = 1, max = 1, options = U.set({ "approach", "input", "top", "notes", "title", "short", "author" }) },
+  check = { min = 1, max = 1 },
+  build = { min = 1, max = 1, flags = U.set({ "figures" }) },
+  inventory = { max = 1, options = U.set({ "rtl", "top", "out" }) },
+  ["chat-pack"] = { min = 1, max = 1, flags = U.set({ "no-inputs" }) },
+  unpack = { min = 2, max = 2 },
+  doctor = { flags = U.set({ "build" }) },
+  bundle = { flags = U.set({ "check" }) },
+  version = {},
+  help = {},
 }
 
-local function parse(command)
-  local pos, opt, i = {}, {}, 2
-  while arg[i] ~= nil do
-    local name = arg[i]:match("^%-%-(.+)$")
-    if name then
-      if not OPTIONS[command][name] then U.fail("unknown option --%s for '%s' (see: specforge help)", name, command) end
-      if FLAGS[name] then
-        opt[name] = true
-      else
-        i = i + 1
-        if arg[i] == nil then U.fail("--%s needs a value", name) end
-        opt[name] = arg[i]
-      end
-    else
-      pos[#pos + 1] = arg[i]
-    end
-    i = i + 1
-  end
-  return pos, opt
-end
-
 local function project_dir(pos)
-  if not pos[1] then U.fail("name the project folder") end
   return (U.abs(pos[1]):gsub("/$", ""))
 end
 
@@ -102,6 +87,9 @@ function run.new(pos, opt)
   local dir = project_dir(pos)
   for _, f in ipairs(P.create(ROOT, dir, opt)) do U.say("  " .. f) end
   U.say("Created the project " .. dir)
+  if not opt.input then
+    U.say("Put your design files in " .. dir .. (opt.approach == "rtl" and "/inputs/rtl" or "/inputs"))
+  end
 end
 
 function run.check(pos) B.run(ROOT, project_dir(pos), { pdf = false, figures = false }) end
@@ -113,7 +101,8 @@ function run.inventory(pos, opt)
   if pos[1] then
     local p = P.load(ROOT, project_dir(pos), false)
     if p.approach ~= "rtl" then U.fail("the approach of this project is %s, not rtl", p.approach) end
-    folder, top, out = P.input_dir(p), p.rtl_top, p.dir .. "/build/rtl-inventory.md"
+    if next(opt) then U.fail("give a project, or --rtl <folder> --top <module>, not both") end
+    folder, top, out = P.check_inputs(ROOT, p), p.rtl_top, p.dir .. "/build/rtl-inventory.md"
   else
     if not opt.rtl or not opt.top then U.fail("give a project, or --rtl <folder> --top <module>") end
     folder, top, out = U.abs(opt.rtl), opt.top, opt.out and U.abs(opt.out)
@@ -133,7 +122,6 @@ end
 
 function run.unpack(pos)
   local dir = project_dir(pos)
-  if not pos[2] then U.fail("name the saved answer file") end
   if not U.is_dir(dir) then U.fail("project folder not found: %s", dir) end
   H.unpack(dir, U.abs(pos[2]))
 end
@@ -193,12 +181,12 @@ function run.doctor(_, opt)
     .. (opt.build and "" or " To prove it, run: specforge doctor --build"))
 end
 
-local command = arg[1] or "help"
-if command == "--help" or command == "-h" then command = "help" end
-
 local ok, err = pcall(function()
+  local args = L.arguments(arg)
+  local command = args[1] or "help"
+  if command == "--help" or command == "-h" then command = "help" end
   if not run[command] then U.fail("unknown command '%s' (see: specforge help)", command) end
-  run[command](parse(command))
+  run[command](L.parse(args, COMMANDS[command]))
 end)
 
 io.stdout:flush()

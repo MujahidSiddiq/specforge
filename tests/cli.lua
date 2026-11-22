@@ -1,0 +1,112 @@
+-- Tests of the command line, each command as its own process.
+-- Called by tests/run.lua.
+
+return function(U, test, work, ROOT)
+  local texlua = U.which("texlua")
+  if not texlua then U.fail("texlua not found") end
+  local base = work .. "/cli"
+  local serial = 0
+
+  local function run(...)
+    return U.run(texlua, { ROOT .. "/tools/specforge.lua", ... }, work)
+  end
+  local function fresh()
+    serial = serial + 1
+    local dir = base .. "/case " .. serial
+    U.mkdir(dir)
+    return dir
+  end
+  -- The command fails and creates no project.
+  local function refused(name, project, code)
+    test(name .. ": refused", code ~= 0, "exit code 0")
+    test(name .. ": nothing created", not U.is_file(project .. "/project.md"))
+  end
+
+  U.write(base .. "/info/a.md", "# A\n")
+  U.write(base .. "/rtl/a.sv", "package a_pkg; endpackage\nmodule top(input clk); endmodule\n")
+  U.write(base .. "/empty/notes.txt", "not Markdown\n")
+  local info, rtl = base .. "/info", base .. "/rtl"
+
+  -- bugs 1 and 2: no launcher that hands the arguments to a shell
+  test("no batch launcher", #U.list(ROOT, "%.[cC][mM][dD]$") == 0 and #U.list(ROOT, "%.[bB][aA][tT]$") == 0)
+  if U.windows then
+    local d = fresh() .. "/p"
+    local code = run("new", d, "--approach", "design-info", "--title", "A&B %OS% C^D E|F G>H", "--short", "T", "--author", "T")
+    test("special characters kept", code == 0 and U.read(d .. "/project.md"):find('title: "A&B %OS% C^D E|F G>H"', 1, true))
+  end
+
+  -- bug 3: a lost empty value must not take the next option
+  local p = fresh() .. "/p"
+  refused("option as a value", p, run("new", p, "--approach", "design-info", "--title", "--short", "T", "--author", "T"))
+  p = fresh() .. "/p"
+  refused("blank value", p, run("new", p, "--approach", "design-info", "--title", " ", "--short", "T"))
+  p = fresh() .. "/p"
+  refused("extra value", p, run("new", p, "--approach", "design-info", "--title", "A", "B"))
+  p = fresh() .. "/p"
+  refused("option given twice", p, run("new", p, "--approach", "design-info", "--title", "A", "--title", "B"))
+
+  -- bug 5: the project and the inputs are separate
+  local d = fresh()
+  U.write(d .. "/a.md", "# A\n")
+  p = d .. "/spec"
+  refused("input contains the project", p, run("new", p, "--approach", "design-info", "--input", d))
+  d = fresh()
+  U.write(d .. "/a.md", "# A\n")
+  refused("input is the project", d, run("new", d, "--approach", "design-info", "--input", d))
+  d = fresh()
+  U.write(d .. "/build/a.md", "# A\n")
+  refused("input is the build folder", d, run("new", d, "--approach", "design-info", "--input", d .. "/build"))
+
+  local function configured(approach, key, value, top)
+    local dir = fresh() .. "/spec"
+    local code
+    if approach == "rtl" then code = run("new", dir, "--approach", "rtl", "--input", rtl, "--top", top, "--title", "T", "--short", "T", "--author", "T")
+    else code = run("new", dir, "--approach", "design-info", "--input", info, "--title", "T", "--short", "T", "--author", "T") end
+    test("valid project is created (" .. approach .. ")", code == 0)
+    local text = U.read(dir .. "/project.md"):gsub("\n  " .. key .. ":[^\n]*", "\n  " .. key .. ": " .. value, 1)
+    U.write(dir .. "/project.md", text)
+    return dir
+  end
+  local function no_pack(name, dir)
+    test(name .. ": refused", run("chat-pack", dir) ~= 0, "exit code 0")
+    test(name .. ": no pack written", not U.is_file(dir .. "/build/chat-pack.md"))
+  end
+  no_pack("pack of the project's parent", configured("design-info", "design_info", '".."'))
+  no_pack("pack of the project itself", configured("design-info", "design_info", '"."'))
+  no_pack("pack of notes that contain the project", configured("rtl", "notes", '".."', "top"))
+
+  d = fresh()
+  U.write(d .. "/all/a.md", "# A\n")
+  U.write(d .. "/all/other/project.md", '```yaml\nspecforge_version: "0.2.0"\n```\n')
+  p = d .. "/spec"
+  refused("input contains another project", p, run("new", p, "--approach", "design-info", "--input", d .. "/all"))
+
+  -- bug 6: bad inputs stop at once
+  p = fresh() .. "/p"
+  refused("input does not exist", p, run("new", p, "--approach", "design-info", "--input", base .. "/no-such-folder"))
+  p = fresh() .. "/p"
+  refused("input is a file", p, run("new", p, "--approach", "design-info", "--input", info .. "/a.md"))
+  p = fresh() .. "/p"
+  refused("no Markdown", p, run("new", p, "--approach", "design-info", "--input", base .. "/empty"))
+  p = fresh() .. "/p"
+  refused("no RTL", p, run("new", p, "--approach", "rtl", "--top", "top", "--input", base .. "/empty"))
+  p = fresh() .. "/p"
+  refused("wrong top", p, run("new", p, "--approach", "rtl", "--top", "wrong", "--input", rtl))
+  p = fresh() .. "/p"
+  refused("top is a package", p, run("new", p, "--approach", "rtl", "--top", "a_pkg", "--input", rtl))
+  p = fresh() .. "/p"
+  refused("notes do not exist", p, run("new", p, "--approach", "rtl", "--top", "top", "--input", rtl, "--notes", base .. "/none"))
+  no_pack("pack with a wrong notes path", configured("rtl", "notes", '"../no-such-notes"', "top"))
+  no_pack("pack with zero inputs", configured("design-info", "design_info", '"../../empty"'))
+  no_pack("pack with a wrong top", configured("rtl", "rtl_top", '"wrong"', "top"))
+
+  -- what worked must still work
+  p = fresh() .. "/p"
+  test("default inputs folder", run("new", p, "--approach", "design-info", "--title", "T", "--short", "T", "--author", "T") == 0
+    and U.is_dir(p .. "/inputs"))
+  U.write(p .. "/inputs/a.md", "# A\n")
+  test("pack of the default folder", run("chat-pack", p) == 0 and U.is_file(p .. "/build/chat-pack.md"))
+  d = fresh()
+  U.write(d .. "/design/a.md", "# A\n")
+  test("sibling input", run("new", d .. "/design-spec", "--approach", "design-info", "--input", d .. "/design") == 0)
+end

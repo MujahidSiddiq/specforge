@@ -85,7 +85,7 @@ Each file below starts and ends with a marker line. References such as
 `<specforge>/shared/clarification-rules.md` mean the file of that name below.
 
 ===== BEGIN FILE: <specforge>/VERSION =====
-0.2.0
+0.2.1
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/guides/orchestrator/GUIDE.md =====
@@ -1504,7 +1504,7 @@ relative to the project folder. An empty value (`""`) means "use the
 default" where a default is given.
 
 ```yaml
-specforge_version: "0.2.0"        # framework version this project is built with
+specforge_version: "0.2.1"        # framework version this project is built with
 
 document_type: high-level-spec    # only value supported now: high-level-spec
 

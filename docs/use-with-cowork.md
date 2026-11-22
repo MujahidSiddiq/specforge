@@ -22,7 +22,7 @@ A cowork assistant works on folders that you share with it.
    - It cannot: it writes all files, and you build on your computer:
 
      ```powershell
-     & "D:\specforge\specforge.cmd" build "D:\designs\fifo\spec" --figures
+     texlua "D:\specforge\tools\specforge.lua" build "D:\designs\fifo\spec" --figures
      ```
 
      Give the messages and the PDF back to it for the final check.

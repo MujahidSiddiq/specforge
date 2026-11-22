@@ -15,11 +15,12 @@ end
 local U = module("util")
 local Y = module("yaml", U)
 local C = module("colour")
-local P = module("project", U, Y)
+local I = module("inventory", U)
+local P = module("project", U, Y, I)
+local L = module("cli", U)
 local S = module("style", U, Y, C)
 local M = module("md2tex", U)
 local F = module("figcheck", U)
-local I = module("inventory", U)
 local B = module("build", U, P, S, M, F)
 local H = module("chat", U, P, I, F)
 local ROOT = U.normalize(here .. "/..")
@@ -164,6 +165,27 @@ local function inventory_and_projects()
   refuses("unpack cut-off answer", function() H.unpack(dir, work .. "/cut.txt") end)
 end
 
+local function arguments()
+  local function same(name, line, want)
+    local got = L.repair(line)
+    test(name, got and table.concat(got, "\1") == table.concat(want, "\1"), got and table.concat(got, " | ") or "not recovered")
+  end
+  local exe = [["C:\Program Files\tex\texlua.exe" "C:\my tools\specforge.lua" ]]
+  same("path ending in a backslash", exe .. [[new p --input "C:\my info\" --title "A & B"]],
+    { "new", "p", "--input", "C:\\my info\\", "--title", "A & B" })
+  same("last argument ends in a backslash", exe .. [[check "C:\my project\"]], { "check", "C:\\my project\\" })
+  same("two such paths", exe .. [[new "D:\a b\" --input "D:\c d\" --short T]],
+    { "new", "D:\\a b\\", "--input", "D:\\c d\\", "--short", "T" })
+  same("a share", exe .. [[check "\\server\my share\spec\"]], { "check", "\\\\server\\my share\\spec\\" })
+  same("backslashes doubled by the caller", exe .. [[check "C:\my project\\"]], { "check", "C:\\my project\\" })
+  test("a real quote is not guessed", L.repair(exe .. [[new p --title "say \"hi\" now"]]) == nil)
+  test("open quote is not guessed", L.repair(exe .. [[new "p]]) == nil)
+end
+
+local function command_line()
+  dofile(here .. "/cli.lua")(U, test, work, ROOT)
+end
+
 local function full_build()
   local dir = fixture()
   B.run(ROOT, dir, { pdf = true, figures = U.which("pdftocairo") ~= nil })
@@ -185,6 +207,8 @@ local ok, err = pcall(function()
   configuration()
   figures()
   inventory_and_projects()
+  arguments()
+  command_line()
   full_build()
 end)
 U.remove_tempdir(tmp)

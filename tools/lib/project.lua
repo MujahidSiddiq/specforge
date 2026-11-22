@@ -1,6 +1,6 @@
 -- specforge -- project folders: create, read and check project.md.
 
-return function(U, Y)
+return function(U, Y, I)
   local P = {}
 
   P.APPROACHES = U.set({ "design-info", "rtl" })
@@ -88,6 +88,61 @@ return function(U, Y)
     return U.join(p.dir, p.approach == "rtl" and p.rtl or p.design_info)
   end
 
+  local KINDS = {
+    ["design-info"] = { name = "input", pattern = "%.md$", what = "Markdown files (*.md)" },
+    rtl = { name = "input", pattern = "%.s?vh?$", what = "RTL files (*.sv, *.svh, *.v, *.vh)" },
+    notes = { name = "notes", pattern = "%.md$" },
+  }
+
+  -- Stops on an input or notes folder that is missing, empty or not separate
+  -- from the project. Whatever is in such a folder may be uploaded by
+  -- chat-pack, so it must never hold project files or earlier packs.
+  function P.check_folder(root, dir, folder, kind, out_dir)
+    local k = KINDS[kind]
+    if U.is_file(folder) then U.fail("the %s must be a folder, and this is a file: %s", k.name, folder) end
+    if not U.is_dir(folder) then U.fail("the %s folder does not exist: %s", k.name, folder) end
+
+    if U.same(folder, dir) or U.inside(dir, folder) then
+      U.fail("the %s folder contains the project: %s. Keep design files in their own folder, next to the project", k.name, folder)
+    end
+    local own = { dir .. "/build", dir .. "/chapters", dir .. "/figures", out_dir or dir .. "/output" }
+    for _, d in ipairs(own) do
+      if U.same(folder, d) or U.inside(folder, d) then
+        U.fail("the %s folder is a folder that specforge writes to: %s", k.name, folder)
+      end
+    end
+    if U.same(folder, root) or U.inside(root, folder) then
+      U.fail("the %s folder contains specforge itself: %s", k.name, folder)
+    end
+    -- also found this way: another project, or this one reached by a different path
+    for _, rel in ipairs(U.walk(folder, "project%.md$")) do
+      if U.basename(rel):lower() == "project.md" and U.read(folder .. "/" .. rel):find("\nspecforge_version:") then
+        U.fail("the %s folder contains a specforge project (%s/%s). Keep design files in their own folder", k.name, folder, rel)
+      end
+    end
+
+    local files = U.walk(folder, k.pattern)
+    if #files == 0 and k.what then U.fail("no %s in the input folder %s", k.what, folder) end
+    for _, rel in ipairs(files) do U.read(folder .. "/" .. rel) end -- every file must be readable text
+  end
+
+  -- The folders of an existing project, checked.
+  function P.check_inputs(root, p)
+    local input = P.input_dir(p)
+    P.check_folder(root, p.dir, input, p.approach, p.out_dir)
+    local notes
+    if p.approach == "rtl" then
+      I.check_top(I.scan(input), p.rtl_top, input)
+      local folder = U.join(p.dir, p.notes)
+      local unused = U.same(folder, U.join(p.dir, "inputs/notes")) and not U.is_dir(folder)
+      if not unused then
+        P.check_folder(root, p.dir, folder, "notes", p.out_dir)
+        notes = folder
+      end
+    end
+    return input, notes
+  end
+
   function P.create(root, dir, o)
     if dir:lower() == root:lower() or U.inside(dir, root) then
       U.fail("create the project outside the specforge folder")
@@ -95,6 +150,17 @@ return function(U, Y)
     if U.is_file(dir .. "/project.md") then U.fail("%s already has a project.md; nothing was changed", dir) end
     if not P.APPROACHES[o.approach or ""] then U.fail("--approach must be design-info or rtl") end
     if o.approach == "rtl" and not o.top then U.fail("--top <module> is required for --approach rtl") end
+
+    if o.short and o.short:find('[/\\:*?"<>|%c]') then
+      U.fail('--short becomes part of the file name and cannot contain / \\ : * ? " < > |')
+    end
+    -- everything is checked before anything is created
+    if o.input then
+      local input = U.abs(o.input)
+      P.check_folder(root, dir, input, o.approach)
+      if o.approach == "rtl" then I.check_top(I.scan(input), o.top, input) end
+    end
+    if o.notes then P.check_folder(root, dir, U.abs(o.notes), "notes") end
 
     local lines = U.split(U.read(root .. "/config-templates/project.md"), "\n")
     local function put(key, v)
@@ -116,7 +182,6 @@ return function(U, Y)
     if o.input then
       local rel = U.relative(dir, o.input) .. "/"
       put(o.approach == "rtl" and "rtl" or "design_info", rel)
-      if not U.is_dir(U.abs(o.input)) then U.warn("the input folder does not exist yet: " .. o.input) end
     end
     if o.notes then put("notes", U.relative(dir, o.notes) .. "/") end
     put("title", o.title)

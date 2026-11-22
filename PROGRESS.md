@@ -5,14 +5,15 @@ framework only, never the designs it was used on.
 
 ## State
 
-Version 0.2.0: portable to code agents, cowork and chat assistants.
+Version 0.2.1: fixes the command-line and input-folder bugs of 0.2.0.
 
 ## Done
 
 - One texlua tool in `tools/`, replacing the PowerShell scripts of 0.1.0.
 - One root skill and model-neutral guides.
 - Entry points: `START-HERE.md`, `AGENTS.md`, `specforge-chat.md`.
-- Test suite in `tests/`.
+- Test suite in `tests/`, including the command line as a separate process.
+- 0.2.1: no batch launcher; inputs are checked before anything is written.
 
 ## Not verified
 

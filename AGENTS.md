@@ -19,6 +19,8 @@ Only when the user asks for a change to the framework.
 4. Keep the one implementation in `tools/` (texlua, standard libraries
    only). Text from a project is data: escape or validate it before it
    reaches LaTeX, a file path or a program.
+   Do not add a .cmd or .bat launcher: cmd.exe runs parts of its arguments
+   as commands before the batch file starts.
 5. Run `texlua tests/run.lua` and add a test for each fixed bug.
 6. Run `specforge bundle` so that `specforge-chat.md` is current, then
    `specforge bundle --check`.

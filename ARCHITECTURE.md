@@ -31,7 +31,7 @@
 | Document-type guide | `guides/high-level-spec/` | Outline, page budget, content and writing rules of a high-level specification |
 | LaTeX guide | `guides/latex-document/` | How the PDF is produced and checked |
 | LaTeX template | `latex/` | Preamble, title page, TikZ style library |
-| Tool | `tools/`, started by `specforge.cmd` or `specforge.sh` | Project setup, checks, build, RTL inventory, chat pack and unpack, doctor |
+| Tool | `tools/`, started by `texlua tools/specforge.lua` or `specforge.sh` | Project setup, checks, build, RTL inventory, chat pack and unpack, doctor |
 | Tests | `tests/` | `texlua tests/run.lua`; the fixture is also used by `doctor --build` |
 | Record templates | `templates/` | Analysis report, clarification register, outline, revision history, review record |
 | Checklists | `checklists/` | Checks at intake, before a build, before a release |

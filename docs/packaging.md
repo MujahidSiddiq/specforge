@@ -3,7 +3,7 @@
 Run in the specforge folder, with everything committed:
 
 ```powershell
-git archive --format=zip --prefix=specforge/ --output=dist/specforge-0.2.0.zip HEAD
+git archive --format=zip --prefix=specforge/ --output=dist/specforge-0.2.1.zip HEAD
 ```
 
 Create `dist` first if it does not exist, and use the version from

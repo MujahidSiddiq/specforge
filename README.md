@@ -29,8 +29,9 @@ My project folder is <path>.
 
 ## Commands
 
-Windows: `& "<specforge>\specforge.cmd" <command>`.
-Linux and macOS: `sh <specforge>/specforge.sh <command>`.
+Every system: `texlua "<specforge>/tools/specforge.lua" <command>`.
+Linux and macOS also have `sh <specforge>/specforge.sh <command>`.
+On Windows use PowerShell. `texlua` comes with MiKTeX and TeX Live.
 
 | Command | Does |
 |---|---|

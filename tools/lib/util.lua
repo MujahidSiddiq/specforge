@@ -103,8 +103,12 @@ local function key(p) return U.windows and p:lower() or p end
 
 -- True when child is strictly inside parent.
 function U.inside(child, parent)
-  return key(child):sub(1, #parent + 1) == key(parent) .. "/"
+  parent = parent:gsub("/+$", "") -- "C:/" and "/"
+  return #child > #parent + 1 and key(child):sub(1, #parent + 1) == key(parent) .. "/"
 end
+
+-- True when both are the same path as written (links are not resolved).
+function U.same(a, b) return key((a:gsub("/+$", ""))) == key((b:gsub("/+$", ""))) end
 
 -- Path of target relative to the folder base; absolute on another drive.
 function U.relative(base, target)

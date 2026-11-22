@@ -14,7 +14,7 @@ See step 4 of `install.md`.
 ## 2. Make the pack
 
 ```powershell
-& "D:\specforge\specforge.cmd" chat-pack "D:\designs\fifo\spec"
+texlua "D:\specforge\tools\specforge.lua" chat-pack "D:\designs\fifo\spec"
 ```
 
 It lists every file it included. The result is `build\chat-pack.md` in the
@@ -40,7 +40,7 @@ Copy the answer into a text file, for example `D:\designs\fifo\answer.txt`,
 and run:
 
 ```powershell
-& "D:\specforge\specforge.cmd" unpack "D:\designs\fifo\spec" "D:\designs\fifo\answer.txt"
+texlua "D:\specforge\tools\specforge.lua" unpack "D:\designs\fifo\spec" "D:\designs\fifo\answer.txt"
 ```
 
 Only specforge project files are written. A replaced file is kept in
@@ -49,7 +49,7 @@ Only specforge project files are written. A replaced file is kept in
 ## 5. Build
 
 ```powershell
-& "D:\specforge\specforge.cmd" build "D:\designs\fifo\spec" --figures
+texlua "D:\specforge\tools\specforge.lua" build "D:\designs\fifo\spec" --figures
 ```
 
 Paste errors and warnings into the chat. Upload the PDF for the visual

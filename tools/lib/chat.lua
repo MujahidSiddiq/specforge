@@ -64,33 +64,27 @@ return function(U, P, I, F)
 
     local count = 0
     if with_inputs then
-      local input = P.input_dir(p)
-      if not U.is_dir(input) then U.fail("input folder not found: %s", input) end
-      local function add_folder(label, folder, pattern, numbered, skip)
+      local input, notes = P.check_inputs(root, p)
+      local function add_folder(label, folder, pattern, numbered)
         for _, rel in ipairs(U.walk(folder, pattern)) do
-          if not (skip and rel:match(skip)) then
-            local text = U.read(folder .. "/" .. rel)
-            if numbered then
-              local lines = U.split((text:gsub("\n$", "")), "\n")
-              for i, l in ipairs(lines) do lines[i] = string.format("%5d| %s", i, l) end
-              text = table.concat(lines, "\n")
-            end
-            section(out, "INPUT " .. label .. "/" .. rel, text)
-            U.say("  included " .. folder .. "/" .. rel)
-            count = count + 1
+          local text = U.read(folder .. "/" .. rel)
+          if numbered then
+            local lines = U.split((text:gsub("\n$", "")), "\n")
+            for i, l in ipairs(lines) do lines[i] = string.format("%5d| %s", i, l) end
+            text = table.concat(lines, "\n")
           end
+          section(out, "INPUT " .. label .. "/" .. rel, text)
+          U.say("  included " .. folder .. "/" .. rel)
+          count = count + 1
         end
       end
       if p.approach == "rtl" then
-        local ok, inv = pcall(function() return I.markdown(I.scan(input), p.rtl_top) end)
-        if ok then section(out, "INPUT rtl-inventory.md", inv) else U.warn("RTL inventory not included: " .. tostring(type(inv) == "table" and inv.specforge or inv)) end
+        section(out, "INPUT rtl-inventory.md", I.markdown(I.scan(input), p.rtl_top))
         add_folder("rtl", input, "%.s?vh?$", true)
-        local notes = U.join(dir, p.notes)
-        if U.is_dir(notes) then add_folder("notes", notes, "%.md$", false) end
+        if notes then add_folder("notes", notes, "%.md$", false) end
       else
         add_folder("design-info", input, "%.md$", true)
       end
-      if count == 0 then U.warn("no input files found in " .. input) end
     end
     return table.concat(out, "\n"), count
   end

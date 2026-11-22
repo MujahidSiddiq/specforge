@@ -4,6 +4,28 @@ All changes to specforge are listed here, newest first. Versions follow
 semantic versioning: a major version for changes that alter existing
 documents, a minor version for new features, a patch version for fixes.
 
+## 0.2.1 (2026-11-22)
+
+### Changed (action needed)
+
+- `specforge.cmd` is removed. On Windows run
+  `texlua "<specforge>\tools\specforge.lua" <command>` from PowerShell.
+  cmd.exe acted on the arguments before the launcher started, so it could
+  not be made safe. Projects of 0.2.0 need no change.
+
+### Fixed
+
+- A value with `&` or `|` ran as a command on Windows, `<` and `>`
+  redirected, `%NAME%` was replaced and `^` was lost.
+- An empty value took the next option as its value. Empty, repeated and
+  extra values are now refused.
+- A quoted path ending in a backslash merged the following arguments.
+- `chat-pack` packed project files and earlier packs when the input folder
+  contained the project. Such folders are refused.
+- `new`, `chat-pack` and `inventory` stop on a missing input or notes path,
+  a file given as a folder, no input files, unreadable text or a wrong top
+  module. `new` creates nothing in that case.
+
 ## 0.2.0 (2026-11-22)
 
 ### Changed (action needed for 0.1.0 projects)
