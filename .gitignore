@@ -1,6 +1,7 @@
-# generated output of project builds and packaging
+# generated output of project builds
 build/
-/dist/
+
+# archives are never part of the repository
 *.zip
 
 # never publish personal or local assistant settings

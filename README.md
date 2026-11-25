@@ -21,7 +21,7 @@ questions and approve the result.
 
 ```
 my-design/
-  specforge/              this repository (git clone, or the release zip)
+  specforge/              this repository (git clone)
   project_rtl/            your RTL: .sv, .svh, .v, .vh, in any sub-folders
   project_description/    or your description: .md files
   project_colours.md      optional: your colours

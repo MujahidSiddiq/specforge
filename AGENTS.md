@@ -28,7 +28,4 @@ Only when the user asks for a change to the framework.
    files in `.claude-plugin/` and `config-templates/project.md` carry the
    same version.
 8. Commit with a message that says what changed. Push only when asked.
-9. A release zip: `git archive --format=zip --prefix=specforge/
-   --output=dist/specforge-<VERSION>.zip HEAD` (with everything committed).
-   It contains the test fixture, an invented design, which `doctor --build`
-   uses.
+   Specforge is distributed through its Git repository; no zip is made.
