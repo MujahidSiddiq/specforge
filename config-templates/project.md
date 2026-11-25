@@ -6,7 +6,7 @@ relative to the project folder. An empty value (`""`) means "use the
 default" where a default is given.
 
 ```yaml
-specforge_version: "0.2.1"        # framework version this project is built with
+specforge_version: "0.3.0"        # framework version this project is built with
 
 document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 

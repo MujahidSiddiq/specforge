@@ -1,6 +1,6 @@
 {
   "name": "specforge",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Lets an AI write a complete design specification (PDF) of a hardware design from RTL or a Markdown description: detailed or high-level diagrams, state machines, a page maximum, your own colours, and approval gates.",
   "author": {
     "name": "specforge maintainers"

@@ -1,7 +1,7 @@
 # Test fixture: an invented event counter
 
 ```yaml
-specforge_version: "0.2.1"
+specforge_version: "0.3.0"
 document_type: design-spec
 approach: design-info
 diagrams: detailed

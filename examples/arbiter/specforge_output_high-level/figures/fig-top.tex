@@ -1,0 +1,50 @@
+\begin{tikzpicture}
+  % boundary of req_arbiter
+  \draw[boundary] (0,0.6) rectangle (11,6.2);
+  \node[modname, anchor=north west] at (0.15,6.1) {\module{req_arbiter}};
+  % blocks
+  \draw[block] (3,3.3) rectangle (5.6,5.3);
+  \node[blockname] at (4.3,4.55) {FSM};
+  \node[blocksub] at (4.3,3.85) {\module{arb_fsm}};
+  \draw[block] (6.6,1.0) rectangle (9.4,2.9);
+  \node[blockname, align=center] at (8,1.95) {Output\\register};
+  % handshakes, named
+  \node[port] at (0,4.9) {};
+  \draw[sigarrow] (0.1,4.9) -- (3,4.9);
+  \node[siglabel, left] at (-0.12,4.9) {\sig{req_a}};
+  \node[port] at (0,4.3) {};
+  \draw[sigarrow] (0.1,4.3) -- (3,4.3);
+  \node[siglabel, left] at (-0.12,4.3) {\sig{req_b}};
+  \node[port] at (0,3.7) {};
+  \draw[sigarrow] (0.1,3.7) -- (3,3.7);
+  \node[siglabel, left] at (-0.12,3.7) {\sig{ack_i}};
+  \draw[sigarrow] (5.6,4.9) -- (10.9,4.9);
+  \node[port] at (11,4.9) {};
+  \node[siglabel, right] at (11.12,4.9) {\sig{grant_a}};
+  \draw[sigarrow] (5.6,4.3) -- (10.9,4.3);
+  \node[port] at (11,4.3) {};
+  \node[siglabel, right] at (11.12,4.3) {\sig{grant_b}};
+  % information flow between the blocks
+  \draw[bundlearrow] (4.3,3.3) |- (6.6,2.4);
+  \node[flowlabel, anchor=east, align=right] at (4.2,2.75) {port granted,\\transfer done};
+  % packets
+  \node[port] at (0,1.9) {};
+  \draw[packetarrow] (0.1,1.9) -- (6.6,1.9);
+  \node[siglabel, left] at (-0.12,1.9) {\sig{pkt_a}};
+  \node[port] at (0,1.3) {};
+  \draw[packetarrow] (0.1,1.3) -- (6.6,1.3);
+  \node[siglabel, left] at (-0.12,1.3) {\sig{pkt_b}};
+  \draw[sigarrow] (9.4,2.4) -- (10.9,2.4);
+  \node[port] at (11,2.4) {};
+  \node[siglabel, right] at (11.12,2.4) {\sig{valid_o}};
+  \draw[packetarrow] (9.4,1.5) -- (10.9,1.5);
+  \node[port] at (11,1.5) {};
+  \node[siglabel, right] at (11.12,1.5) {\sig{pkt_o}};
+  % legend
+  \draw[sigarrow] (0,-0.1) -- (0.9,-0.1);
+  \node[flowlabel, anchor=west] at (1,-0.1) {signal};
+  \draw[bundlearrow] (2.3,-0.1) -- (3.2,-0.1);
+  \node[flowlabel, anchor=west] at (3.3,-0.1) {information flow};
+  \draw[packetarrow] (6.0,-0.1) -- (6.9,-0.1);
+  \node[flowlabel, anchor=west] at (7.0,-0.1) {packet (Table 3.2)};
+\end{tikzpicture}

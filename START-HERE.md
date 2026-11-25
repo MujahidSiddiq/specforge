@@ -100,7 +100,8 @@ How to run the tool:
 
 ## 4. Work
 
-Read `<specforge>/guides/orchestrator/GUIDE.md` and follow it. It says which
+Read `<specforge>/guides/orchestrator/GUIDE.md` and follow it. For finished
+chapters and figures at both diagram levels, look at `<specforge>/examples/`. It says which
 guide to read at each step. Read a file when the step needs it; you do not
 need to read the whole framework at once. Update `status.md` whenever you
 stop.

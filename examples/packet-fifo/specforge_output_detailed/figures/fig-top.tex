@@ -1,0 +1,58 @@
+\begin{tikzpicture}
+  \draw[boundary] (0,0) rectangle (14,6.4);
+  \node[modname, anchor=north west] at (0.15,6.3) {\module{pkt_fifo}};
+  % blocks
+  \draw[block] (2.4,3.6) rectangle (4.8,5.4);
+  \node[blockname] at (3.6,4.75) {WR};
+  \node[blocksub] at (3.6,4.1) {\module{wr_ctrl}};
+  \draw[block] (6.0,1.2) rectangle (8.4,2.9);
+  \node[blockname] at (7.2,2.3) {MEM};
+  \node[blocksub] at (7.2,1.6) {\module{pkt_mem}};
+  \draw[block] (9.6,3.6) rectangle (12.0,5.4);
+  \node[blockname] at (10.8,4.75) {RD};
+  \node[blocksub] at (10.8,4.1) {\module{rd_ctrl}};
+  % producer side
+  \node[port] at (0,5.0) {};
+  \draw[sigarrow] (0.1,5.0) -- (2.4,5.0);
+  \node[siglabel, left] at (-0.12,5.0) {\sig{in_valid}};
+  \node[port] at (0,4.1) {};
+  \draw[sigarrow] (2.4,4.1) -- (0.1,4.1);
+  \node[siglabel, left] at (-0.12,4.1) {\sig{in_ready}};
+  \node[port] at (0,2.05) {};
+  \draw[packetarrow] (0.1,2.05) -- (6.0,2.05);
+  \node[siglabel, left] at (-0.12,2.05) {\sig{in_pkt}};
+  % write control to memory and read control
+  \draw[sigarrow] (4.8,5.1) -- (9.6,5.1);
+  \node[siglabel, above] at (5.6,5.1) {\sig{wr_en}};
+  \node[junction] at (6.6,5.1) {};
+  \draw[sigarrow] (6.6,5.1) -- (6.6,2.9);
+  \draw[sigarrow] (4.8,3.9) -| (7.6,2.9);
+  \node[siglabel, right] at (7.6,3.35) {\sig{wr_ptr[1:0]}};
+  % read control to write control and out
+  \draw[sigarrow] (9.6,4.5) -- (4.8,4.5);
+  \node[siglabel, above] at (8.6,4.5) {\sig{count[2:0]}};
+  \draw[sigarrow] (12.0,4.5) -- (13.9,4.5);
+  \node[port] at (14,4.5) {};
+  \node[siglabel, right] at (14.12,4.5) {\sig{count[2:0]}};
+  \draw[sigarrow] (10.8,3.6) |- (8.4,2.5);
+  \node[siglabel, below left] at (10.8,2.5) {\sig{rd_ptr[1:0]}};
+  % consumer side
+  \draw[sigarrow] (12.0,5.1) -- (13.9,5.1);
+  \node[port] at (14,5.1) {};
+  \node[siglabel, right] at (14.12,5.1) {\sig{out_valid}};
+  \node[port] at (14,3.9) {};
+  \draw[sigarrow] (13.9,3.9) -- (12.0,3.9);
+  \node[siglabel, right] at (14.12,3.9) {\sig{out_ready}};
+  \draw[packetarrow] (8.4,1.6) -- (13.9,1.6);
+  \node[port] at (14,1.6) {};
+  \node[siglabel, right] at (14.12,1.6) {\sig{out_pkt}};
+  % clock and reset
+  \node[port] at (0,0.5) {};
+  \node[siglabel, left] at (-0.12,0.5) {\sig{clk}, \sig{rst_n}};
+  \node[flowlabel, anchor=west] at (0.2,0.5) {to all blocks};
+  % legend
+  \draw[sigarrow] (0,-0.7) -- (0.9,-0.7);
+  \node[flowlabel, anchor=west] at (1,-0.7) {signal (width if more than 1 bit)};
+  \draw[packetarrow] (6,-0.7) -- (6.9,-0.7);
+  \node[flowlabel, anchor=west] at (7,-0.7) {packet \sig{pkt_t} (40 bits, Table 3.3)};
+\end{tikzpicture}

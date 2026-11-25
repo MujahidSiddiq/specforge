@@ -1,0 +1,14 @@
+\begin{tikzpicture}
+  \node[fsmstate] (idle) at (0,0)      {IDLE};
+  \node[fsmstate] (ga)   at (3.8,1.8)  {GRANT\_A\fsmout{grant\_a}};
+  \node[fsmstate] (gb)   at (3.8,-1.8) {GRANT\_B\fsmout{grant\_b}};
+  \node[fsmstate] (wait) at (7.6,0)    {WAIT\_ACK};
+  \node[fsmresetdot] (rst) at (-2.3,0) {};
+  \draw[fsmreset] (rst) -- node[fsmcond, above] {reset} (idle);
+  \draw[fsmtrans] (idle) to[bend left=15] node[fsmcond, above left, align=right] {1: A requests, and\\B does not or was last} (ga);
+  \draw[fsmtrans] (idle) to[bend right=15] node[fsmcond, below left] {2: B requests} (gb);
+  \draw[fsmtrans] (ga) to[bend left=15] node[fsmcond, above right] {next cycle} (wait);
+  \draw[fsmtrans] (gb) to[bend right=15] node[fsmcond, below right] {next cycle} (wait);
+  \draw[fsmtrans] (wait) -- node[fsmcond, above] {acknowledged} (idle);
+  \fsmlegend{(-2.3,-3.3)}
+\end{tikzpicture}

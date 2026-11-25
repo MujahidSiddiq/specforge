@@ -61,6 +61,13 @@ local function conversion()
   test("prose cannot inject", not has(M.inline("\\input{secret}"), "\\input"))
   test("pipe in a code cell", #M.cells("| `a | b` | c |") == 2)
   test("escaped pipe", M.cells("| a \\| b | c |")[1] == "a | b")
+  local conv = M.converter({ ["page.paper"] = "a4", ["page.margin_mm"] = 22, ["tables.column_sep_pt"] = 6,
+    ["figures.max_height_fraction"] = 0.44, ["figures.max_height_fraction_timing"] = 0.62, ["figures.floats_stay_in_chapter"] = true })
+  local body = table.concat(conv.convert("# 1. A\n\n- first line\n  goes on\n- second\n\nAfter.\n", "x.md", false, 1), "\n")
+  test("one picture is a scalable box", M.single_picture("% c\n\\begin{tikzpicture}\n\\draw (0,0)--(1,1);\n\\end{tikzpicture}\n"))
+  test("a picture with text is not", not M.single_picture("\\begin{tikzpicture}\\end{tikzpicture}\n\\par text"))
+  test("a timing table is not", not M.single_picture("\\begin{tikztimingtable}\\end{tikztimingtable}"))
+  test("wrapped list item stays one item", body:find("\\item first line goes on", 1, true) and select(2, body:gsub("\\item", "")) == 2, body)
   refuses("link injection", function() M.inline("[x](https://a.b/}\\input{y})") end)
   refuses("file link", function() M.inline("[x](file:///etc/passwd)") end)
 end
@@ -245,6 +252,30 @@ local function command_line()
   dofile(here .. "/cli.lua")(U, test, work, ROOT)
 end
 
+-- The examples: the chapters are the same at both diagram levels, and every
+-- example builds cleanly within its page maximum.
+local function examples()
+  for _, name in ipairs({ "arbiter", "packet-fifo" }) do
+    local base = ROOT .. "/examples/" .. name
+    local d, h = base .. "/specforge_output_detailed/chapters", base .. "/specforge_output_high-level/chapters"
+    local same = #U.list(d) > 0 and #U.list(d) == #U.list(h)
+    for _, f in ipairs(U.list(d)) do same = same and U.is_file(h .. "/" .. f) and U.read(d .. "/" .. f) == U.read(h .. "/" .. f) end
+    test(name .. ": same chapters at both levels", same)
+    for _, level in ipairs({ "detailed", "high-level" }) do
+      local copy = work .. "/examples/" .. name
+      local from = base .. "/specforge_output_" .. level
+      for _, rel in ipairs(U.walk(from)) do
+        if not rel:match("^build/") and not rel:match("^output/") then U.copy(from .. "/" .. rel, copy .. "/out_" .. level .. "/" .. rel) end
+      end
+      for _, rel in ipairs(U.walk(base)) do
+        if rel:match("^project_") then U.copy(base .. "/" .. rel, copy .. "/" .. rel) end
+      end
+      local ok, err = pcall(B.run, ROOT, copy .. "/out_" .. level, { pdf = true, figures = false })
+      test(name .. " " .. level .. " builds", ok, not ok and (type(err) == "table" and err.specforge or err) or nil)
+    end
+  end
+end
+
 local function full_build()
   local dir = fixture()
   B.run(ROOT, dir, { pdf = true, figures = U.which("pdftocairo") ~= nil })
@@ -268,6 +299,7 @@ local ok, err = pcall(function()
   inventory_and_projects()
   arguments()
   command_line()
+  examples()
   full_build()
 end)
 U.remove_tempdir(tmp)

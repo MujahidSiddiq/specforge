@@ -66,6 +66,8 @@ return function(U, Y, I)
     if not kind then bad[#bad + 1] = "document_type must be design-spec (is '" .. p.type .. "')" end
     kind = kind or P.TYPES["design-spec"]
     p.subtitle = p.subtitle or kind.subtitle
+    -- a 0.2 project has no diagram level; its document stays as it was
+    p.diagrams_shown = p.diagrams ~= nil
     if p.type == "high-level-spec" then p.diagrams = p.diagrams or "high-level" end
     if p.diagrams and not P.DIAGRAMS[p.diagrams] then
       bad[#bad + 1] = "diagrams must be detailed or high-level (is '" .. p.diagrams .. "')"

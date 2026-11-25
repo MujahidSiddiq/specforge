@@ -1,0 +1,10 @@
+\begin{tikzpicture}
+  \node[fsmstate] (empty) at (0,0)   {EMPTY};
+  \node[fsmstate] (valid) at (5.2,0) {VALID\fsmout{out\_valid}};
+  \node[fsmresetdot] (rst) at (-2.2,0) {};
+  \draw[fsmreset] (rst) -- node[fsmcond, above] {reset} (empty);
+  \draw[fsmtrans] (empty) to[bend left=20] node[fsmcond, above] {packet stored} (valid);
+  \draw[fsmtrans] (valid) to[bend left=20] node[fsmcond, below, align=center] {last packet read,\\none written / read} (empty);
+  \path[fsmtrans] (valid) edge[loop right] node[fsmcond, right, align=left] {packet read,\\more left / read} (valid);
+  \fsmlegend{(-2.2,-2.4)}
+\end{tikzpicture}

@@ -28,7 +28,7 @@ return function(U, P, S, M, F)
       local function row(k, x) add("| " .. k .. " | " .. md_cell(x) .. " |") end
       row("Document type", p.subtitle)
       row("Design", p.title)
-      if p.diagrams then row("Diagram level", p.diagrams == "detailed" and "Detailed" or "High-level") end
+      if p.diagrams_shown then row("Diagram level", p.diagrams == "detailed" and "Detailed" or "High-level") end
       row("Revision", p.revision)
       row("Date", date)
       row("Author", p.author)
@@ -145,7 +145,12 @@ return function(U, P, S, M, F)
 
     local date = p.date or today()
     local front = front_matter(p, style.value, date)
-    local conv = M.converter(style.value)
+    -- 0.2 projects keep their figure placement: no scaling of wide pictures
+    local reader = p.type ~= "high-level-spec" and function(name)
+      local file = dir .. "/figures/" .. name .. ".tex"
+      return U.is_file(file) and U.read(file) or nil
+    end or nil
+    local conv = M.converter(style.value, reader)
     local front_tex = conv.convert(table.concat(front, "\n") .. "\n", "front matter", true)
 
     local files = U.list(dir .. "/chapters", "^%d%d_.*%.md$")
@@ -232,7 +237,7 @@ return function(U, P, S, M, F)
     tex[#tex + 1] = "\\pagestyle{empty}"
     tex[#tex + 1] = "\\begin{document}"
     for _, f in ipairs(job.figures) do
-      tex[#tex + 1] = "\\begin{preview}\\begin{varwidth}{\\textwidth}"
+      tex[#tex + 1] = "\\begin{preview}\\begin{varwidth}{4\\textwidth}"
         .. (M.is_timing(f.name) and "\\justifying" or "\\centering")
         .. "\\input{figures/" .. f.name .. "}\\end{varwidth}\\end{preview}"
     end

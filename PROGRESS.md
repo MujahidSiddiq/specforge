@@ -5,7 +5,8 @@ framework only, never the designs it was used on.
 
 ## State
 
-Version 0.2.1: fixes the command-line and input-folder bugs of 0.2.0.
+Version 0.3.0: complete design specifications, detailed or high-level diagrams,
+state machine notation, page maximum, workspace layout, plain-name colours.
 
 ## Done
 
@@ -22,6 +23,9 @@ Version 0.2.1: fixes the command-line and input-folder bugs of 0.2.0.
 - Linux, macOS and TeX Live.
 - A complete document written by an AI other than Claude.
 - A complete document through the chat route.
+- A complete 0.3.0 document written by an AI (the examples were written by
+  hand to test the notation).
+- The page estimate factors for complete specifications (first estimates).
 - Upload of the folder as a skill in an assistant's web or cowork app.
 
 ## Next

@@ -4,6 +4,46 @@ All changes to specforge are listed here, newest first. Versions follow
 semantic versioning: a major version for changes that alter existing
 documents, a minor version for new features, a patch version for fixes.
 
+## 0.3.0 (2026-11-25)
+
+### Changed (action needed)
+
+- The document type is now `design-spec`, a complete design
+  specification: every signal, packet, storage element, state machine and
+  timing that the inputs give. Projects of 0.2 (`high-level-spec`) still
+  build unchanged.
+- `page_budget.max` is a maximum; there is no minimum. The document is
+  fitted by writing and layout; content is never left out without the
+  user's approval.
+- `docs/` is removed; the README and `USER-GUIDE.md` replace it.
+
+### Added
+
+- `diagrams: detailed | high-level` (`new --diagrams`). Detailed diagrams
+  show every signal with its width; high-level diagrams show the important
+  signals and draw the rest as labelled information arrows. The text is
+  the same at both levels.
+- Packet arrows (`packetarrow`): a struct or interface is one arrow, never
+  its fields; `flowlabel` for information flows.
+- State machine notation: circular states, curved or straight transitions,
+  loops, reset entry from a dot, dashed inputs and outputs, legend
+  (`fsmstate`, `fsmtrans`, `fsmreset`, `fsmcond`, `\fsmout`, `\fsmlegend`).
+- Workspace layout: `new` without values finds `project_rtl` and/or
+  `project_description` next to `specforge`, finds the top module, and
+  creates `specforge_output`. `new --pages`.
+- Colours by plain name in `style.md` (`text`, `block_fill`, `waveform`,
+  `state_fill` ...); any element colour may be `#RRGGBB`; 34 contrast
+  pairs are checked.
+- AI-first README with one prompt, rewritten `START-HERE.md` and user
+  guide, and two example designs in `examples/`.
+
+### Fixed
+
+- A list item written on several indented lines was split into a list
+  item and a paragraph.
+- A single drawing wider than the text ran past the margin; it is now
+  scaled down (new projects only, so 0.2 documents keep their layout).
+
 ## 0.2.1 (2026-11-22)
 
 ### Changed (action needed)

@@ -106,6 +106,7 @@ Step-by-step installation: [USER-GUIDE.md](USER-GUIDE.md).
 | [AGENTS.md](AGENTS.md) | Changing specforge itself |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Workflow, configuration, how to extend |
 | [CHANGELOG.md](CHANGELOG.md) | Changes per version |
+| [examples/](examples/README.md) | Two finished example documents, each with detailed and high-level diagrams |
 
 Command line (`texlua specforge/tools/specforge.lua <command>`; Linux and
 macOS also `sh specforge/specforge.sh <command>`): `doctor --build`, `new`,

@@ -1,0 +1,14 @@
+\begin{tikztimingtable}[sfwave]
+  \sig{clk}     & [sfclock]5{HL} \\
+  \sig{req_a}   & 4H 6L \\
+  \sig{req_b}   & 10L \\
+  state         & 2D{IDLE} 2D{GRANT\_A} 4D{WAIT\_ACK} 2D{IDLE} \\
+  \sig{grant_a} & 2L 2H 6L \\
+  \sig{ack_i}   & 6L 2H 2L \\
+  \sig{valid_o} & 4L 4H 2L \\
+  \sig{pkt_o}   & 4D{0} 6D{pkt\_a} \\
+\extracode
+  \begin{scope}
+    \wavecycles{5}
+  \end{scope}
+\end{tikztimingtable}

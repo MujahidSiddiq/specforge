@@ -86,7 +86,7 @@ Each file below starts and ends with a marker line. References such as
 `<specforge>/shared/clarification-rules.md` mean the file of that name below.
 
 ===== BEGIN FILE: <specforge>/VERSION =====
-0.2.1
+0.3.0
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/guides/orchestrator/GUIDE.md =====
@@ -1241,7 +1241,9 @@ or font size directly in a figure.
 - Avoid crossing connections; when one is unavoidable, draw it without a
   junction dot, and use a dot only where wires really connect.
 - Use the input's names for blocks and signals, in the monospace font for
-  signals (`\sig{name}`) and modules (`\module{name}`).
+  signals (`\sig{name}`) and modules (`\module{name}`). These print their
+  argument literally, so write each name out; do not use a `\foreach`
+  variable inside them.
 - Label text is at least 8 pt (the style default).
 - Colour never carries meaning alone: a highlighted path or entry also has
   a label, and control and data signals also differ in line width.
@@ -1320,6 +1322,9 @@ Example:
   yourself.
 - Signal names in figure labels are always written with `\sig{...}`; a bare
   underscore stops the build.
+- `\sig{...}` prints its argument literally: never put a macro or a
+  `\foreach` variable inside it (it would print `\n`). Write each label
+  out.
 - Signals from top to bottom: clock, inputs in causal order, outputs.
 - Values that are not specified are drawn as `U` (hatched), never as an
   invented value.
@@ -1623,7 +1628,7 @@ relative to the project folder. An empty value (`""`) means "use the
 default" where a default is given.
 
 ```yaml
-specforge_version: "0.2.1"        # framework version this project is built with
+specforge_version: "0.3.0"        # framework version this project is built with
 
 document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 
@@ -2582,7 +2587,7 @@ texlua and needs nothing else.
 \tikzset{
   fsmstate/.style={circle, draw=\sfStateMachinesStateDraw, fill=\sfStateMachinesStateFill,
                    line width=\sfStateMachinesStateLinePt pt,
-                   minimum size=\sfStateMachinesStateSizeMm mm, inner sep=1pt, align=center,
+                   minimum size=\sfStateMachinesStateSizeMm mm, inner sep=2pt, align=center,
                    font=\ttfamily\sfsize{\sfStateMachinesNameSizePt}, text=textprimary},
   fsmtrans/.style={draw=\sfStateMachinesTransitionColour,
                    line width=\sfStateMachinesTransitionLinePt pt,

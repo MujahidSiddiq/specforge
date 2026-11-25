@@ -221,7 +221,18 @@ return function(U)
   local function is_timing(name) return name:match("^fig%-wave%-") or name:match("^fig%-timing%-") end
   M.is_timing = is_timing
 
-  function M.converter(value)
+  -- True for a figure that is one tikzpicture and nothing else. Such a
+  -- figure is scaled down as a box when it is wider than the text.
+  function M.single_picture(text)
+    if not text then return false end
+    local body = U.trim((text:gsub("%%[^\n]*", "")))
+    local _, pictures = body:gsub("\\begin%s*{tikz", "")
+    return pictures == 1 and body:match("^\\begin%s*{tikzpicture}") ~= nil
+      and body:match("\\end%s*{tikzpicture}$") ~= nil
+  end
+
+  -- read_figure(name) returns the source of figures/NAME.tex, or nil.
+  function M.converter(value, read_figure)
     local paper = value["page.paper"] == "letter" and 215.9 or 210
     local self = {
       known = {}, refs = {}, figures = {},
@@ -353,12 +364,16 @@ return function(U)
           local short = fcap:match("^(..-%.)%s") or fcap
           add("\\begin{figure}[htbp]")
           add("  \\centering")
-          -- varwidth keeps multi-part figures in vertical mode; ragged-right
+          -- One picture: a box of its natural width, scaled down if too wide.
+          -- Anything else: varwidth keeps it in vertical mode; ragged-right
           -- text distorts tikz-timing tables, so those are set justified.
-          add("  \\adjustbox{max totalheight=" .. (wave and max_wave or max_fig)
-            .. "\\textheight,max width=\\linewidth}{\\begin{varwidth}{\\linewidth}"
-            .. (wave and "\\justifying" or "\\centering")
-            .. "\\input{figures/" .. figure.name .. "}\\end{varwidth}}")
+          local limit = "  \\adjustbox{max totalheight=" .. (wave and max_wave or max_fig) .. "\\textheight,max width=\\linewidth}"
+          if not wave and read_figure and M.single_picture(read_figure(figure.name)) then
+            add(limit .. "{\\input{figures/" .. figure.name .. "}}")
+          else
+            add(limit .. "{\\begin{varwidth}{\\linewidth}" .. (wave and "\\justifying" or "\\centering")
+              .. "\\input{figures/" .. figure.name .. "}\\end{varwidth}}")
+          end
           add("  \\caption[" .. "{" .. M.inline(short, true, where) .. "}]{" .. M.inline(fcap, true, where) .. "}")
           add("\\end{figure}")
           figure = nil
@@ -400,6 +415,12 @@ return function(U)
           local body = M.inline(item, false, where)
           if body:match("^%[") then body = "{}" .. body end
           add("  \\item " .. body)
+          return
+        end
+
+        -- an indented line under a list item continues that item
+        if #lists > 0 and line:match("^%s%s+%S") then
+          out[#out] = out[#out] .. " " .. M.inline(U.trim(line), false, where)
           return
         end
 
