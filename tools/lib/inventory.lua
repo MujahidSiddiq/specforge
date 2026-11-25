@@ -311,6 +311,25 @@ return function(U)
     return res
   end
 
+  -- Modules that no other module instantiates. Instances made by modules
+  -- without ports (test benches) do not count, and such modules are not
+  -- candidates themselves unless nothing else is left.
+  function I.tops(res)
+    local used, with_ports, without = {}, {}, {}
+    for _, u in ipairs(res.units) do
+      if u.kind == "module" and #u.info.ports > 0 then
+        for _, inst in ipairs(u.info.instances) do used[inst.type] = true end
+      end
+    end
+    for _, u in ipairs(res.units) do
+      if u.kind == "module" and not used[u.name] then
+        local list = #u.info.ports > 0 and with_ports or without
+        list[#list + 1] = u.name
+      end
+    end
+    return #with_ports > 0 and with_ports or without
+  end
+
   function I.check_top(res, top, dir)
     local u = res.by_name[top]
     if u and u.kind == "module" then return end

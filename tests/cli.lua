@@ -116,6 +116,44 @@ return function(U, test, work, ROOT)
   test("--pages is written", run("new", p, "--approach", "design-info", "--pages", "12") == 0
     and U.read(p .. "/project.md"):find("\n  max: 12", 1, true))
 
+  -- the folder layout: <workspace>/specforge, project_rtl or project_description
+  local function workspace(parts)
+    local ws = fresh() .. "/ws"
+    for rel, text in pairs(parts) do U.write(ws .. "/" .. rel, text) end
+    return ws
+  end
+  local function has(dir, text) return U.is_file(dir .. "/project.md") and U.read(dir .. "/project.md"):find(text, 1, true) end
+
+  local ws = workspace({ ["project_description/a.md"] = "# A\n" })
+  test("description found", run("new", ws .. "/specforge_output") == 0
+    and has(ws .. "/specforge_output", 'approach: "design-info"') and has(ws .. "/specforge_output", 'design_info: "../project_description/"'))
+
+  ws = workspace({ ["project_rtl/a.sv"] = "module leaf(input a); endmodule\nmodule top(input a); leaf u(.a(a)); endmodule\n" })
+  test("RTL and its top found", run("new", ws .. "/specforge_output") == 0
+    and has(ws .. "/specforge_output", 'rtl_top: "top"') and has(ws .. "/specforge_output", 'rtl: "../project_rtl/"'))
+
+  ws = workspace({ ["project_rtl/a.sv"] = "module top(input a); endmodule\n",
+    ["project_rtl/tb/tb.sv"] = "module tb; top dut(.a(1'b0)); endmodule\n", ["project_description/intent.md"] = "# Intent\n" })
+  test("RTL with notes, test bench ignored", run("new", ws .. "/specforge_output") == 0
+    and has(ws .. "/specforge_output", 'rtl_top: "top"') and has(ws .. "/specforge_output", 'notes: "../project_description/"'))
+
+  ws = workspace({ ["project_rtl/a.sv"] = "module one(input a); endmodule\nmodule two(input a); endmodule\n" })
+  refused("two possible tops", ws .. "/specforge_output", run("new", ws .. "/specforge_output"))
+  test("a given top is used", run("new", ws .. "/specforge_output", "--top", "two") == 0 and has(ws .. "/specforge_output", 'rtl_top: "two"'))
+
+  ws = workspace({ ["other/a.md"] = "# A\n" })
+  refused("nothing to find", ws .. "/specforge_output", run("new", ws .. "/specforge_output"))
+
+  -- without a project folder: specforge_output next to the specforge folder
+  ws = workspace({ ["project_description/a.md"] = "# A\n" })
+  for _, part in ipairs({ "VERSION", "tools", "config-templates", "templates", "styles" }) do
+    if U.is_file(ROOT .. "/" .. part) then U.copy(ROOT .. "/" .. part, ws .. "/specforge/" .. part)
+    else for _, rel in ipairs(U.walk(ROOT .. "/" .. part)) do U.copy(ROOT .. "/" .. part .. "/" .. rel, ws .. "/specforge/" .. part .. "/" .. rel) end end
+  end
+  local code = U.run(texlua, { ws .. "/specforge/tools/specforge.lua", "new", "--diagrams", "detailed", "--pages", "12" }, ws)
+  test("default project folder", code == 0 and has(ws .. "/specforge_output", 'design_info: "../project_description/"')
+    and has(ws .. "/specforge_output", "max: 12") and has(ws .. "/specforge_output", 'diagrams: "detailed"'))
+
   -- what worked must still work
   p = fresh() .. "/p"
   test("default inputs folder", run("new", p, "--approach", "design-info", "--title", "T", "--short", "T", "--author", "T") == 0

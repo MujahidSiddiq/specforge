@@ -163,11 +163,55 @@ return function(U, Y, I)
     return input, notes
   end
 
+  P.LAYOUT = { rtl = "project_rtl", ["design-info"] = "project_description", output = "specforge_output" }
+
+  -- Fills approach, input, notes and top from the folders next to the
+  -- project when they are not given:
+  --   <workspace>/project_rtl/          RTL (the top module is found)
+  --   <workspace>/project_description/  Markdown; with RTL, the intent notes
+  -- Returns lines that say what was found.
+  function P.detect(dir, o)
+    local parent = U.dirname(dir)
+    local rtl, desc = parent .. "/" .. P.LAYOUT.rtl, parent .. "/" .. P.LAYOUT["design-info"]
+    local said = {}
+    if not o.approach and not o.input then
+      if U.is_dir(rtl) then
+        o.approach, o.input = "rtl", rtl
+        if U.is_dir(desc) and not o.notes then o.notes = desc end
+      elseif U.is_dir(desc) then
+        o.approach, o.input = "design-info", desc
+      else
+        U.fail("give --approach, or put the RTL in %s or the Markdown description in %s", rtl, desc)
+      end
+      said[#said + 1] = "Found " .. U.basename(o.input) .. ": approach " .. o.approach
+        .. (o.notes and ", with " .. U.basename(o.notes) .. " as notes on purpose and intent" or "")
+    elseif o.approach and not o.input then
+      local folder = parent .. "/" .. (P.LAYOUT[o.approach] or "")
+      if U.is_dir(folder) then
+        o.input = folder
+        said[#said + 1] = "Found " .. U.basename(folder)
+      end
+    end
+    if o.approach == "rtl" and o.input and not o.top then
+      local folder = U.abs(o.input)
+      if U.is_dir(folder) then
+        local tops = I.tops(I.scan(folder))
+        if #tops ~= 1 then
+          U.fail("give --top: the top module could be %s", #tops > 0 and table.concat(tops, ", ") or "(no module found)")
+        end
+        o.top = tops[1]
+        said[#said + 1] = "Top module: " .. o.top .. " (the only module that no other module uses; give --top to choose another)"
+      end
+    end
+    return said
+  end
+
   function P.create(root, dir, o)
     if dir:lower() == root:lower() or U.inside(dir, root) then
       U.fail("create the project outside the specforge folder")
     end
     if U.is_file(dir .. "/project.md") then U.fail("%s already has a project.md; nothing was changed", dir) end
+    local said = P.detect(dir, o)
     if not P.APPROACHES[o.approach or ""] then U.fail("--approach must be design-info or rtl") end
     if o.approach == "rtl" and not o.top then U.fail("--top <module> is required for --approach rtl") end
     if o.diagrams and not P.DIAGRAMS[o.diagrams] then U.fail("--diagrams must be detailed or high-level") end
@@ -238,6 +282,7 @@ return function(U, Y, I)
     end
     place("colour-record.md", U.read(root .. "/styles/colour-record-template.md"))
     place(".gitignore", "build/\n")
+    for _, line in ipairs(said) do U.say(line) end
     U.mkdir(dir .. "/chapters")
     U.mkdir(dir .. "/figures")
     if not o.input then U.mkdir(dir .. (o.approach == "rtl" and "/inputs/rtl" or "/inputs")) end

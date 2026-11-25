@@ -39,10 +39,12 @@ local ROOT = U.dirname(U.normalize(here))
 local HELP = [[
 specforge <command> ...
 
-  new <project> --approach design-info|rtl [--input <folder>] [--top <module>]
+  new [<project>] [--approach design-info|rtl] [--input <folder>] [--top <module>]
                 [--notes <folder>] [--title <text>] [--short <name>] [--author <name>]
                 [--diagrams detailed|high-level] [--pages <maximum>]
-        create a project folder; existing files are never overwritten
+        create a project folder; existing files are never overwritten.
+        Without values it uses the layout <workspace>/specforge (this tool),
+        project_rtl or project_description, and creates specforge_output
   check <project>
         check configuration, style, chapters and figures; write the Markdown
   build <project> [--figures]
@@ -62,7 +64,7 @@ specforge <command> ...
 ]]
 
 local COMMANDS = {
-  new = { min = 1, max = 1, options = U.set({ "approach", "input", "top", "notes", "title", "short", "author", "diagrams", "pages" }) },
+  new = { min = 0, max = 1, options = U.set({ "approach", "input", "top", "notes", "title", "short", "author", "diagrams", "pages" }) },
   check = { min = 1, max = 1 },
   build = { min = 1, max = 1, flags = U.set({ "figures" }) },
   inventory = { max = 1, options = U.set({ "rtl", "top", "out" }) },
@@ -85,7 +87,8 @@ function run.help() io.stdout:write(HELP) end
 function run.version() U.say("specforge " .. P.version(ROOT)) end
 
 function run.new(pos, opt)
-  local dir = project_dir(pos)
+  -- default: specforge_output next to the specforge folder
+  local dir = pos[1] and project_dir(pos) or U.dirname(ROOT) .. "/" .. P.LAYOUT.output
   for _, f in ipairs(P.create(ROOT, dir, opt)) do U.say("  " .. f) end
   U.say("Created the project " .. dir)
   if not opt.input then

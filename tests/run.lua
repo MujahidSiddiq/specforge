@@ -161,6 +161,7 @@ local function inventory_and_projects()
   test("Verilog-1995 ports", #res.by_name.top.info.ports == 3)
   test("instances", #res.by_name.top.info.instances == 3)
   test("brackets in a value", res.by_name.p.info.params[1].value == "$clog2(16+1)")
+  test("top found", table.concat(I.tops(res), ",") == "top")
   refuses("unknown top", function() I.markdown(res, "nothing") end)
 
   local dir = work .. "/created"
