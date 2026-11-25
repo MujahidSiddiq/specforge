@@ -107,6 +107,15 @@ return function(U, test, work, ROOT)
   test("--diagrams is written", run("new", p, "--approach", "design-info", "--diagrams", "high-level") == 0
     and U.read(p .. "/project.md"):find('\ndiagrams: "high-level"', 1, true))
 
+  -- the page maximum
+  p = fresh() .. "/p"
+  refused("--pages not a number", p, run("new", p, "--approach", "design-info", "--pages", "ten"))
+  p = fresh() .. "/p"
+  refused("--pages zero", p, run("new", p, "--approach", "design-info", "--pages", "0"))
+  p = fresh() .. "/p"
+  test("--pages is written", run("new", p, "--approach", "design-info", "--pages", "12") == 0
+    and U.read(p .. "/project.md"):find("\n  max: 12", 1, true))
+
   -- what worked must still work
   p = fresh() .. "/p"
   test("default inputs folder", run("new", p, "--approach", "design-info", "--title", "T", "--short", "T", "--author", "T") == 0

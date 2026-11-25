@@ -98,6 +98,10 @@ local function configuration()
     return dir
   end
   refuses("unknown diagram level", function() P.load(ROOT, level("diagrams: magic"), true) end)
+  local half = fixture()
+  U.write(half .. "/project.md", (U.read(half .. "/project.md"):gsub("max: 15", "max: 12.5")))
+  refuses("page maximum must be whole", function() P.load(ROOT, half, true) end)
+  test("no page minimum by default", P.load(ROOT, level("diagrams: detailed"), true).min_pages == 1)
   refuses("diagram level needed for a build", function() P.load(ROOT, level('diagrams: ""'), true) end)
   test("diagram level may wait until the build", P.load(ROOT, level('diagrams: ""'), false).diagrams == nil)
   test("0.2 projects keep a given level", P.load(ROOT, typed("high-level-spec"), true).diagrams == "detailed")

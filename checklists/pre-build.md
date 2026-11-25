@@ -14,7 +14,7 @@
 - [ ] No overfull boxes, undefined references or missing characters, or
       each remaining warning is explained.
 - [ ] No warnings about references to items that do not exist.
-- [ ] The page count is within the budget, or the user approved the
+- [ ] The page count is at most the maximum, or the user approved the
       exception.
 
 ## Visual check (rendered pages)

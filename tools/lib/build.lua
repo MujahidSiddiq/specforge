@@ -261,10 +261,13 @@ return function(U, P, S, M, F)
     if count == 0 then U.say("Clean build: no overfull boxes, undefined references or missing characters.") end
     local pages = tonumber(log:gsub("[\r\n]", ""):match("Output written on .-%((%d+) page"))
     if not pages then return end
-    local budget = string.format("(budget %d to %d)", p.min_pages, p.max_pages)
-    if pages > p.max_pages then U.warn(pages .. " pages: above the page budget " .. budget .. ".")
-    elseif pages < p.min_pages then U.say(pages .. " pages: below the page budget " .. budget .. " -- check that nothing is missing.")
-    else U.say(pages .. " pages " .. budget .. ".") end
+    if pages > p.max_pages then
+      U.warn(string.format("%d pages: above the page maximum of %d. Fit the layout, or ask the user (design-spec rule 02).", pages, p.max_pages))
+    elseif pages < p.min_pages then
+      U.say(string.format("%d pages: below page_budget.min (%d) -- check that nothing is missing.", pages, p.min_pages))
+    else
+      U.say(string.format("%d pages (maximum %d).", pages, p.max_pages))
+    end
   end
 
   -- opts.figures: export SVG previews; opts.pdf: compile the document.

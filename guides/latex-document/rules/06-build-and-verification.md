@@ -28,8 +28,8 @@ specforge build <project> --figures
 | `undefined`, `multiply defined` | Fix the reference or label |
 | `Missing character` | The font lacks a character: replace it or choose a font that has it |
 | Warning `'Table N.M' does not exist` | Fix the reference in the chapter |
-| Page count above the budget | Shorten (see the document-type guide), or ask the user before exceeding it |
-| Page count below the budget | Check that nothing is missing; do not pad |
+| `above the page maximum` | Fit the document as `design-spec` rule 02 says; never cut content without the user's approval |
+| `below page_budget.min` (projects of 0.2) | Check that nothing is missing; do not pad |
 
 ### 2. Visual check
 
@@ -74,4 +74,4 @@ because it compiles.**
 ## Delivering
 
 Report to the user: the PDF and Markdown paths, the page count against the
-budget, the warnings left (with reasons), and what was not checked.
+maximum, the warnings left (with reasons), and what was not checked.

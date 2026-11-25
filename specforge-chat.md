@@ -658,108 +658,71 @@ outline.
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/guides/design-spec/rules/02-page-budget.md =====
-# 02 - Page budget
+# 02 - Page maximum
 
 ## Target
 
-The total page count, including the front matter, is between
-`page_budget.min` and `page_budget.max` in `project.md` (default 10 to 15).
-The build reports the count after every build.
+`page_budget.max` in `project.md` is the user's page limit: the total page
+count, including the front matter, must not exceed it. There is no
+minimum: a small design gives a short document, and nothing is padded.
+(`page_budget.min`, from projects of 0.2, only adds a note to the build
+output.) The build reports the count after every build.
 
-## Allocation
+The limit never removes content (`GUIDE.md`, rule 4). The document is fitted
+by writing and layout, and if the complete design does not fit, the user
+decides.
 
-Allocate pages in the outline before drafting. For a target of T pages:
+## Estimating the length
 
-| Part | Pages | Notes |
-|---|---|---|
-| Front matter | 2 to 3 | Title page; document information, revision history and contents on one or two pages |
-| 1 Introduction | 1 | |
-| 2 Design Overview | 2 to 3 | About one page per hierarchy diagram with its text |
-| 3 Interfaces | 1 to 2 | Grouped interface tables, not one row per signal |
-| Behaviour chapters | the rest | About 1 page per chapter; up to 3 for the most complex flow with its worked example |
-| Exceptional Conditions | 1 | |
-| Constraints, Assumptions and Limitations | 1 | |
-| References | 0.5 | May share a page |
-
-The parts other than the behaviour chapters total about 8.5 to 12.5 pages,
-which leaves about 2.5 to 6.5 pages for the behaviour chapters within a
-15-page budget.
-
-## Reference calibration
-
-The values above were measured on the reference document specforge was
-derived from (a 15-page HLS of a design with two major blocks of three
-sub-blocks each):
-
-| Part | Pages |
-|---|---|
-| Front matter | 3 |
-| Introduction (with terminology table) | 1 |
-| Design Overview (three hierarchy diagrams, parameter table) | 2 |
-| Interfaces (12 interface groups in two tables) | 1 |
-| Three behaviour chapters | 1, 1, 3 (the last with a worked example of two figures and a table, and a timing diagram) |
-| Exceptional Conditions (flush, simultaneous operations) | 1 |
-| Constraints, Assumptions and Limitations | 1 |
-| References | 1 |
-| **Total** | **15**, with 6 figures and 10 tables |
-
-## Estimating the length of a new design
-
-Estimate before writing the outline:
+Estimate before writing the outline, from the counts found in the
+analysis:
 
 ```
-pages ≈ F                          front matter: 2 for a first revision, 3 when the
-                                   revision history has several entries
-      + 1                          introduction
-      + 0.6 × D + 0.3              design overview; D = hierarchy diagrams (+0.3 for the parameter table)
-      + 0.5 + 0.05 × G             interfaces; G = interface groups (external and internal)
-      + Σ (1 + 1.5 × E + 0.5 × W)  behaviour chapters; E = worked examples, W = timing diagrams in the chapter
-      + 1                          exceptional conditions
-      + 1                          constraints, assumptions and limitations
-      + 0.5                        references
+pages ≈ F                              front matter: 2, or 3 when the revision history has several entries
+      + 1                              introduction
+      + D × L + 0.3                    design overview; D = block diagrams, L = 0.6 high-level, 0.9 detailed
+      + 0.5 + S / 30 + 0.25 × K        interfaces; S = signals in tables, K = packets with field tables
+      + Σ (1 + 1.5 × E + 0.5 × W)      behaviour chapters; E = worked examples, W = timing diagrams
+      + 0.8 × M + 0.15 × R + 0.5 × T   block chapters; M = state machines, R = storage elements, T = timing diagrams
+      + 1                              exceptional conditions
+      + 1                              constraints, assumptions and limitations
+      + 0.5                            references
 ```
 
-For the reference document (F = 3, D = 3, G = 12, three behaviour chapters
-with E = 1 and W = 1 in one of them) this gives 14.7 pages; the result was
-15.
+Detailed diagrams count more because crowded ones are split
+(`05-diagram-levels.md`). The factors for signals, packets, state machines
+and block chapters are first estimates: after each document, compare the
+estimate with the result and record the difference in specforge's
+`CHANGELOG.md`, so that the factors improve.
 
-Calibration from the first two projects built with specforge (both first
-revisions, F = 2):
+Earlier documents, which left signal lists and internal detail out,
+measured: 15 pages estimated 14.7; 13 pages estimated 13.7 (twice).
 
-| Project | Estimate | Result |
-|---|---:|---:|
-| High-level specification from RTL | 13.7 | 13 |
-| High-level specification from design information | 13.7 | 13 |
+Record the estimate, with the counts used, in `outline.md`.
 
-Both came out about 0.7 pages below the estimate because short chapters
-share pages; no factor is changed for that yet.
+## Fitting the maximum
 
-Record the estimate in `outline.md`. If it exceeds `page_budget.max`, apply
-the techniques below in the outline, and if it still exceeds the budget,
-ask the user whether to raise the budget or to drop content (and which).
-After each document, compare the estimate with the result and note
-systematic differences in specforge's `CHANGELOG.md`, so the factors improve
-over time.
+If the estimate or a build exceeds the maximum, apply these steps in
+order, rebuilding after each, and stop when the document fits:
 
-## Fitting the budget
+1. **Write tighter.** One statement per fact; no repetition between
+   chapters; refer back instead of explaining again.
+2. **Compact tables.** Combine small tables of the same kind; use compact
+   description cells; keep every row.
+3. **Compact figures.** Draw at the final size with less empty space;
+   place a figure next to its first reference so that pages fill; never
+   let labels fall below 8 pt.
+4. **Compact layout,** through `style.md` overrides, and tell the user
+   which ones you set: `page.margin_mm` down to 18,
+   `page.class_font_size_pt` 10, `figures.max_height_fraction` down to
+   0.38, `front_matter.share_one_page` true.
+5. **Report and ask.** Build, and tell the user the smallest page count
+   reached with the complete content. Offer the choices: raise the
+   maximum, or name content to leave out (which the user chooses). Wait
+   for the answer.
 
-Apply in this order, stopping when the document fits:
-
-1. Write tighter: one statement per fact; no repetition between chapters;
-   refer back instead of explaining again.
-2. Group interfaces: one table row per interface group, not per signal;
-   leave widths and timing to the detailed specification.
-3. Merge an end-to-end scenario into the behaviour chapter it illustrates
-   instead of a separate scenarios chapter.
-4. Limit timing diagrams to the one flow where cycle order matters most.
-5. Use the compact layout defaults: chapters run on, front matter on one
-   page, contents with chapters only, no lists of figures or tables,
-   figures scaled to under half a page (all are the style defaults).
-6. Drop optional sections (see `01-outline.md`).
-7. Ask the user.
-
-A document below `page_budget.min` is not padded: check that nothing from
-the inputs is missing, and report the shortfall.
+Never leave content out, shorten a table or change the diagram level to
+meet the maximum without the user's approval.
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/guides/design-spec/rules/03-content.md =====
@@ -1457,8 +1420,8 @@ specforge build <project> --figures
 | `undefined`, `multiply defined` | Fix the reference or label |
 | `Missing character` | The font lacks a character: replace it or choose a font that has it |
 | Warning `'Table N.M' does not exist` | Fix the reference in the chapter |
-| Page count above the budget | Shorten (see the document-type guide), or ask the user before exceeding it |
-| Page count below the budget | Check that nothing is missing; do not pad |
+| `above the page maximum` | Fit the document as `design-spec` rule 02 says; never cut content without the user's approval |
+| `below page_budget.min` (projects of 0.2) | Check that nothing is missing; do not pad |
 
 ### 2. Visual check
 
@@ -1503,7 +1466,7 @@ because it compiles.**
 ## Delivering
 
 Report to the user: the PDF and Markdown paths, the page count against the
-budget, the warnings left (with reasons), and what was not checked.
+maximum, the warnings left (with reasons), and what was not checked.
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/shared/clarification-rules.md =====
@@ -1685,8 +1648,7 @@ document:
   related_documents: []           # list of "Title, revision, date" strings
 
 page_budget:
-  min: 10                         # total pages including front matter
-  max: 15
+  max: 15                         # the most pages, front matter included (the user's number)
 
 ```
 
@@ -1700,7 +1662,7 @@ page_budget:
 | `inputs.rtl_top` | for `rtl` | The module the specification describes. |
 | `inputs.notes` | no | Answers intent questions in advance for the `rtl` approach. |
 | `document.title`, `short_name`, `author` | yes | Used on the title page, in the header and in the PDF metadata. |
-| `page_budget` | no | Default 10 to 15 pages. The assistant asks before exceeding `max`. |
+| `page_budget.max` | no | Default 15. A maximum: the document is fitted by layout; if the complete design does not fit, the assistant asks. |
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/config-templates/style.md =====
@@ -1889,7 +1851,7 @@ IDs behind the section.
 
 Show the calculation of `guides/design-spec/rules/02-page-budget.md`
 with the counts used (major blocks, interface groups, behaviour chapters,
-worked examples, timing diagrams), and the budget-fitting steps applied.
+worked examples, timing diagrams, signals, packets, state machines), and the fitting steps applied.
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/templates/review-record.md =====
@@ -2020,7 +1982,7 @@ One line per session or step, newest last: date, what was done.
 - [ ] No overfull boxes, undefined references or missing characters, or
       each remaining warning is explained.
 - [ ] No warnings about references to items that do not exist.
-- [ ] The page count is within the budget, or the user approved the
+- [ ] The page count is at most the maximum, or the user approved the
       exception.
 
 ## Visual check (rendered pages)

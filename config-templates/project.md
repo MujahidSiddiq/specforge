@@ -38,8 +38,7 @@ document:
   related_documents: []           # list of "Title, revision, date" strings
 
 page_budget:
-  min: 10                         # total pages including front matter
-  max: 15
+  max: 15                         # the most pages, front matter included (the user's number)
 
 ```
 
@@ -53,4 +52,4 @@ page_budget:
 | `inputs.rtl_top` | for `rtl` | The module the specification describes. |
 | `inputs.notes` | no | Answers intent questions in advance for the `rtl` approach. |
 | `document.title`, `short_name`, `author` | yes | Used on the title page, in the header and in the PDF metadata. |
-| `page_budget` | no | Default 10 to 15 pages. The assistant asks before exceeding `max`. |
+| `page_budget.max` | no | Default 15. A maximum: the document is fitted by layout; if the complete design does not fit, the assistant asks. |

@@ -49,7 +49,7 @@ return function(U, Y, I)
       status = text(cfg, "document.status", "Draft"),
       date = text(cfg, "document.date"),
       language = text(cfg, "document.language", "en-GB"),
-      min_pages = tonumber(text(cfg, "page_budget.min", "10")),
+      min_pages = tonumber(text(cfg, "page_budget.min", "1")),
       max_pages = tonumber(text(cfg, "page_budget.max", "15")),
       related = {},
     }
@@ -74,7 +74,9 @@ return function(U, Y, I)
     end
     if not P.APPROACHES[p.approach] then bad[#bad + 1] = "approach must be design-info or rtl (is '" .. p.approach .. "')" end
     if p.approach == "rtl" and not p.rtl_top then bad[#bad + 1] = "inputs.rtl_top is empty (required for rtl)" end
-    if not p.min_pages or not p.max_pages then bad[#bad + 1] = "page_budget.min and max must be numbers" end
+    if not p.min_pages or not p.max_pages or p.max_pages < 1 or p.max_pages ~= math.floor(p.max_pages) then
+      bad[#bad + 1] = "page_budget.max must be a whole number of pages"
+    end
     if not p.language:match("^[%a%d%-]+$") then bad[#bad + 1] = "document.language must be a language tag such as en-GB" end
     if strict then
       for _, k in ipairs({ "title", "short_name", "author" }) do
@@ -169,6 +171,9 @@ return function(U, Y, I)
     if not P.APPROACHES[o.approach or ""] then U.fail("--approach must be design-info or rtl") end
     if o.approach == "rtl" and not o.top then U.fail("--top <module> is required for --approach rtl") end
     if o.diagrams and not P.DIAGRAMS[o.diagrams] then U.fail("--diagrams must be detailed or high-level") end
+    if o.pages and not (o.pages:match("^%d+$") and tonumber(o.pages) >= 1) then
+      U.fail("--pages must be a whole number of pages, at least 1")
+    end
 
     if o.short and o.short:find('[/\\:*?"<>|%c]') then
       U.fail('--short becomes part of the file name and cannot contain / \\ : * ? " < > |')
@@ -198,6 +203,17 @@ return function(U, Y, I)
     put("specforge_version", P.version(root))
     put("approach", o.approach)
     put("diagrams", o.diagrams)
+    if o.pages then
+      local done = false
+      for i, line in ipairs(lines) do
+        local lead, rest = line:match("^(%s*)max:(.*)$")
+        if lead and not done then
+          lines[i] = lead .. "max: " .. o.pages .. (rest:match("%s+#.*$") or "")
+          done = true
+        end
+      end
+      if not done then U.fail("config-templates/project.md has no page_budget.max") end
+    end
     put("rtl_top", o.top)
     if o.input then
       local rel = U.relative(dir, o.input) .. "/"

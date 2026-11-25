@@ -43,4 +43,4 @@ IDs behind the section.
 
 Show the calculation of `guides/design-spec/rules/02-page-budget.md`
 with the counts used (major blocks, interface groups, behaviour chapters,
-worked examples, timing diagrams), and the budget-fitting steps applied.
+worked examples, timing diagrams, signals, packets, state machines), and the fitting steps applied.
