@@ -16,7 +16,7 @@ return function(U)
     "begin", "end", "tikz", "tikzset", "node", "draw", "path", "fill", "filldraw",
     "coordinate", "matrix", "pic", "clip", "shade", "foreach", "pgfmathsetmacro",
     "pgfmathtruncatemacro", "extracode", "wavecycles", "wavenote", "wavefont", "nrows",
-    "tablerules",
+    "tablerules", "fsmout", "fsmlegend", "fsmlegendio",
     -- simple programming
     "def", "newcommand", "renewcommand", "relax", "numexpr", "the", "fpeval",
     "ifnum", "ifx", "if", "ifodd", "else", "fi",

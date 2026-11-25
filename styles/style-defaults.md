@@ -209,6 +209,21 @@ diagrams:                          # colour-guide.md Sections 5.4, 12
   group_title_size_pt: 8.5
   width_label_size_pt: 8
 
+state_machines:                    # state diagrams: circles and arrows
+  state:
+    draw: border_strong
+    fill: accent_subtle            # text_primary on it is contrast-checked
+    line_pt: 0.9
+    size_mm: 13                    # smallest circle; all states the same size
+  name_size_pt: 8.5                # state name, monospace
+  label_size_pt: 8                 # conditions, outputs, legend
+  transition:
+    colour: text_secondary
+    line_pt: 0.8
+  reset:
+    colour: text_primary           # reset entry: filled dot, thicker line
+    line_pt: 1.4
+
 timing:                            # colour-guide.md Sections 5.7, 13
   signal_colour: text_primary
   clock_colour: text_secondary
@@ -240,6 +255,7 @@ pdf:
 | `header_footer` | Running header and footer | Section 19 |
 | `captions` | Figure and table captions | Sections 12.6, 17.4 |
 | `tables` | All tables | Sections 5.2, 11 |
+| `state_machines` | State diagrams | Sections 5.4, 12 |
 | `callouts` | Open points, pending markers, highlighted notes | Sections 5.3, 16 |
 | `figures` | Figure size and placement | Section 17 |
 | `diagrams` | Block and architecture diagrams | Sections 5.4, 12 |

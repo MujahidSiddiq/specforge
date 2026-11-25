@@ -125,7 +125,7 @@ local function figures()
     environment = "\\begin{filecontents}{x}",
   }
   for name, text in pairs(bad) do test("figure refuses " .. name, #F.check(text, name) > 0) end
-  for _, f in ipairs({ "fig-evc", "fig-wave-evc" }) do
+  for _, f in ipairs({ "fig-evc", "fig-wave-evc", "fig-fsm-evc" }) do
     local p = F.check(U.read(ROOT .. "/tests/fixture/figures/" .. f .. ".tex"), f)
     test("figure accepts " .. f, #p == 0, table.concat(p, "; "))
   end
@@ -215,7 +215,7 @@ local function full_build()
   U.run(totext, { "-enc", "UTF-8", pdf, work .. "/pdf.txt" })
   local t = U.read_bytes(work .. "/pdf.txt")
   for _, s in ipairs({ "duty_50%", "#(WIDTH)", "{msb,lsb}", "data}", "\\escaped.name", "ready | valid",
-    "x}\\textbf{INJECTED", "$clog2(DEPTH)", "[row]", "Diagram level", "count_pkt" }) do
+    "x}\\textbf{INJECTED", "$clog2(DEPTH)", "[row]", "Diagram level", "count_pkt", "COUNT", "event && !full / inc=1" }) do
     test("PDF shows " .. s, has(t, s))
   end
   test("no doubled hash", not has(t, "##"))

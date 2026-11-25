@@ -12,8 +12,16 @@
 %   bundle/bundlearrow  signal bundle or information flow  hlarrow  highlighted path (label it!)
 %   packet/packetarrow  one packet (struct, interface): one arrow, no fields
 %   junction, djunction  wire junctions (thin, thick)  zoomline  zoom guide (dashed)
-%   siglabel  signal name     blockname / modname  block / module name
+%   siglabel  signal name     flowlabel  information in words
+%   blockname / modname  block / module name
 %   blocksub  block sub-label grouptitle           group title     widthlabel  bus width
+% State machines (see latex-document rule 04)
+%   fsmstate   state: a circle, never a box       fsmresetdot, fsmreset  reset entry
+%   fsmtrans   state transition (straight, bend left/right, loop above/...)
+%   fsmcond    transition label: condition / outputs
+%   fsminput, fsmoutput  signals entering or leaving the machine (dashed)
+%   \fsmout{text}  outputs inside a state circle (below the name)
+%   \fsmlegend{(x,y)}, \fsmlegendio{(x,y)}  legend of the arrow kinds
 % Buffer and pointer illustrations
 %   entry, entryhl (highlighted), entrydim (invalid), entrywarn (warning; label it)
 %   ptrarrow  pointer arrow   rangebrace  brace under a range of entries
@@ -118,6 +126,9 @@
                    text=textsecondary, align=center},
   grouptitle/.style={font=\bfseries\sfsize{\sfDiagramsGroupTitleSizePt},
                      text=textprimary, inner sep=1.6pt},
+  % what an information flow carries, in words (not a signal name)
+  flowlabel/.style={font=\sfsize{\sfDiagramsSignalLabelSizePt},
+                    text=textprimary, inner sep=1.6pt},
   widthlabel/.style={font=\sfsize{\sfDiagramsWidthLabelSizePt},
                      text=textsecondary, inner sep=1.6pt},
 }
@@ -136,3 +147,45 @@
   rangebrace/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
                      decorate, decoration={brace, amplitude=5pt, mirror}},
 }
+
+% ---- State machines -------------------------------------------------------------
+% States are circles. Transitions are filled-head arrows, straight or bent;
+% the reset entry starts at a filled dot; signals into or out of the
+% machine are dashed. Colours and sizes come from the state_machines keys.
+\tikzset{
+  fsmstate/.style={circle, draw=\sfStateMachinesStateDraw, fill=\sfStateMachinesStateFill,
+                   line width=\sfStateMachinesStateLinePt pt,
+                   minimum size=\sfStateMachinesStateSizeMm mm, inner sep=1pt, align=center,
+                   font=\ttfamily\sfsize{\sfStateMachinesNameSizePt}, text=textprimary},
+  fsmtrans/.style={draw=\sfStateMachinesTransitionColour,
+                   line width=\sfStateMachinesTransitionLinePt pt,
+                   -{Stealth[length=2.4mm,width=1.8mm]}, shorten >=0.4pt,
+                   every loop/.style={looseness=6, min distance=8mm}},
+  fsmresetdot/.style={circle, fill=\sfStateMachinesResetColour, draw=none,
+                      minimum size=2.2mm, inner sep=0pt},
+  fsmreset/.style={draw=\sfStateMachinesResetColour, line width=\sfStateMachinesResetLinePt pt,
+                   -{Stealth[length=2.8mm,width=2.2mm]}, shorten >=0.4pt},
+  fsmcond/.style={font=\ttfamily\sfsize{\sfStateMachinesLabelSizePt}, text=textprimary,
+                  fill=bgpage, inner sep=1pt, align=center},
+  fsminput/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
+                   dash pattern=on 3pt off 2pt, -{Stealth[length=2.2mm,width=1.6mm]}},
+  fsmoutput/.style={fsminput},
+}
+% Outputs inside a state circle, below the name (Moore outputs).
+\newcommand{\fsmout}[1]{\\{\color{textsecondary}\sfsize{\sfStateMachinesLabelSizePt}#1}}
+% Legend: reset entry and transition; #1 = top left corner, e.g. (0,-3).
+\newcommand{\fsmlegend}[1]{%
+  \begin{scope}[shift={#1}]
+    \node[fsmresetdot] (fsmlgdot) at (0,0) {};
+    \draw[fsmreset] (fsmlgdot) -- (0.9,0);
+    \node[flowlabel, anchor=west] at (1.0,0) {reset};
+    \draw[fsmtrans] (0,-0.55) -- (0.9,-0.55);
+    \node[flowlabel, anchor=west] at (1.0,-0.55) {transition: condition / outputs};
+  \end{scope}}
+% Legend with the dashed inputs and outputs of the machine as well.
+\newcommand{\fsmlegendio}[1]{%
+  \fsmlegend{#1}%
+  \begin{scope}[shift={#1}]
+    \draw[fsminput] (0,-1.1) -- (0.9,-1.1);
+    \node[flowlabel, anchor=west] at (1.0,-1.1) {input or output signal};
+  \end{scope}}

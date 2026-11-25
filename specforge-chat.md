@@ -936,7 +936,7 @@ diagram shows (below).
 |---|---|---|
 | Signal | One RTL port or wire, single bit or bus | An arrow with its name. Detailed level: with its width |
 | Packet | A SystemVerilog struct type, an interface, or a group of fields that the inputs describe as one packet | **One** `packetarrow` labelled with the packet name. Its fields are never drawn; they are in the packet's table, and the caption or text names that table |
-| Information flow | Several signals that serve one purpose (high-level level only) | One `bundlearrow` labelled with what it carries, for example "write request" |
+| Information flow | Several signals that serve one purpose (high-level level only) | One `bundlearrow` with a `flowlabel` saying what it carries, for example "write request" |
 
 ## Detailed diagrams
 
@@ -1266,6 +1266,7 @@ or font size directly in a figure.
 | Highlighted path | `hlarrow` (always labelled) |
 | Junction | `junction`, `djunction` |
 | Signal name, width | `siglabel`, `widthlabel` |
+| What an information flow carries, in words | `flowlabel` |
 | Block or module name, sub-label, group title | `blockname`, `modname`, `blocksub`, `grouptitle` |
 | Buffer entries, pointer, range | `entry`, `entryhl`, `entrydim`, `entrywarn`, `ptrarrow`, `rangebrace` |
 
@@ -1284,6 +1285,62 @@ or font size directly in a figure.
   to fit, which shrinks the labels, so draw it at its final size.
 - A drawing shared by several documents of one project is kept in one file
   and reused, not copied.
+
+## State machine diagrams
+
+A state machine is drawn as a state diagram, never as a block diagram.
+
+| Element | Notation | Style |
+|---|---|---|
+| State | A **circle** with the state name as in the inputs. Never a box | `fsmstate` |
+| Outputs that depend on the state only | Inside the circle, below the name, at most two short lines | `\fsmout{...}` |
+| Reset state | An arrow from a filled dot, labelled with the reset condition | `fsmresetdot`, `fsmreset` |
+| Transition | A filled-head arrow labelled `condition`, or `condition / outputs` when outputs also depend on inputs | `fsmtrans`, `fsmcond` |
+| Signals into or out of the machine (only when the figure shows them) | Dashed arrows | `fsminput`, `fsmoutput` |
+| Legend | Whenever more than one kind of arrow is drawn | `\fsmlegend{(x,y)}` or `\fsmlegendio{(x,y)}` |
+
+Shape of each transition:
+
+- **Straight** between neighbouring states when it is the only transition
+  between them and crosses nothing.
+- **Curved** when two states have transitions in both directions: give
+  both `bend left=20`, so that they bend apart and never overlap.
+- **Curved** around a state or label that lies in the way (`bend left=40`,
+  or `out=` and `in=` angles).
+- A **loop** (`loop above`, `loop below`, `loop left`, `loop right`) only
+  for a staying condition that the reader needs, for example one with
+  outputs. "Otherwise the state is kept" is said once in the caption
+  instead of drawing a loop at every state.
+- When conditions of one state can be true at the same time, prefix each
+  label with its priority: `1: start`, `2: abort`.
+
+Layout:
+
+- The reset state is on the left or at the top. The main sequence runs
+  left to right or clockwise; return paths run below or right to left.
+- All states have the same size. Leave at least 2.6 cm between the centres
+  of neighbouring states, so that labels fit.
+- Every label is next to its arrow (`auto`, or `above`/`below`), with the
+  `fsmcond` background so that it stays readable over other lines.
+- Place the legend below or beside the states, clear of every arrow and
+  label.
+- At most about 10 states in one diagram (see `design-spec`, rule 05).
+- The transition table in the text gives every exact condition; the
+  caption names it.
+
+Example:
+
+```latex
+\begin{tikzpicture}
+  \node[fsmstate] (idle) at (0,0)   {IDLE};
+  \node[fsmstate] (run)  at (3.6,0) {RUN\fsmout{busy=1}};
+  \node[fsmresetdot] (rst) at (-1.6,0) {};
+  \draw[fsmreset] (rst) -- node[fsmcond, above] {reset} (idle);
+  \draw[fsmtrans] (idle) to[bend left=20] node[fsmcond, above] {start} (run);
+  \draw[fsmtrans] (run)  to[bend left=20] node[fsmcond, below] {done / irq=1} (idle);
+  \fsmlegend{(-1.6,-1.8)}
+\end{tikzpicture}
+```
 
 ## Timing diagrams
 
@@ -2214,6 +2271,21 @@ diagrams:                          # colour-guide.md Sections 5.4, 12
   group_title_size_pt: 8.5
   width_label_size_pt: 8
 
+state_machines:                    # state diagrams: circles and arrows
+  state:
+    draw: border_strong
+    fill: accent_subtle            # text_primary on it is contrast-checked
+    line_pt: 0.9
+    size_mm: 13                    # smallest circle; all states the same size
+  name_size_pt: 8.5                # state name, monospace
+  label_size_pt: 8                 # conditions, outputs, legend
+  transition:
+    colour: text_secondary
+    line_pt: 0.8
+  reset:
+    colour: text_primary           # reset entry: filled dot, thicker line
+    line_pt: 1.4
+
 timing:                            # colour-guide.md Sections 5.7, 13
   signal_colour: text_primary
   clock_colour: text_secondary
@@ -2245,6 +2317,7 @@ pdf:
 | `header_footer` | Running header and footer | Section 19 |
 | `captions` | Figure and table captions | Sections 12.6, 17.4 |
 | `tables` | All tables | Sections 5.2, 11 |
+| `state_machines` | State diagrams | Sections 5.4, 12 |
 | `callouts` | Open points, pending markers, highlighted notes | Sections 5.3, 16 |
 | `figures` | Figure size and placement | Section 17 |
 | `diagrams` | Block and architecture diagrams | Sections 5.4, 12 |
@@ -2366,8 +2439,16 @@ texlua and needs nothing else.
 %   bundle/bundlearrow  signal bundle or information flow  hlarrow  highlighted path (label it!)
 %   packet/packetarrow  one packet (struct, interface): one arrow, no fields
 %   junction, djunction  wire junctions (thin, thick)  zoomline  zoom guide (dashed)
-%   siglabel  signal name     blockname / modname  block / module name
+%   siglabel  signal name     flowlabel  information in words
+%   blockname / modname  block / module name
 %   blocksub  block sub-label grouptitle           group title     widthlabel  bus width
+% State machines (see latex-document rule 04)
+%   fsmstate   state: a circle, never a box       fsmresetdot, fsmreset  reset entry
+%   fsmtrans   state transition (straight, bend left/right, loop above/...)
+%   fsmcond    transition label: condition / outputs
+%   fsminput, fsmoutput  signals entering or leaving the machine (dashed)
+%   \fsmout{text}  outputs inside a state circle (below the name)
+%   \fsmlegend{(x,y)}, \fsmlegendio{(x,y)}  legend of the arrow kinds
 % Buffer and pointer illustrations
 %   entry, entryhl (highlighted), entrydim (invalid), entrywarn (warning; label it)
 %   ptrarrow  pointer arrow   rangebrace  brace under a range of entries
@@ -2472,6 +2553,9 @@ texlua and needs nothing else.
                    text=textsecondary, align=center},
   grouptitle/.style={font=\bfseries\sfsize{\sfDiagramsGroupTitleSizePt},
                      text=textprimary, inner sep=1.6pt},
+  % what an information flow carries, in words (not a signal name)
+  flowlabel/.style={font=\sfsize{\sfDiagramsSignalLabelSizePt},
+                    text=textprimary, inner sep=1.6pt},
   widthlabel/.style={font=\sfsize{\sfDiagramsWidthLabelSizePt},
                      text=textsecondary, inner sep=1.6pt},
 }
@@ -2490,4 +2574,46 @@ texlua and needs nothing else.
   rangebrace/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
                      decorate, decoration={brace, amplitude=5pt, mirror}},
 }
+
+% ---- State machines -------------------------------------------------------------
+% States are circles. Transitions are filled-head arrows, straight or bent;
+% the reset entry starts at a filled dot; signals into or out of the
+% machine are dashed. Colours and sizes come from the state_machines keys.
+\tikzset{
+  fsmstate/.style={circle, draw=\sfStateMachinesStateDraw, fill=\sfStateMachinesStateFill,
+                   line width=\sfStateMachinesStateLinePt pt,
+                   minimum size=\sfStateMachinesStateSizeMm mm, inner sep=1pt, align=center,
+                   font=\ttfamily\sfsize{\sfStateMachinesNameSizePt}, text=textprimary},
+  fsmtrans/.style={draw=\sfStateMachinesTransitionColour,
+                   line width=\sfStateMachinesTransitionLinePt pt,
+                   -{Stealth[length=2.4mm,width=1.8mm]}, shorten >=0.4pt,
+                   every loop/.style={looseness=6, min distance=8mm}},
+  fsmresetdot/.style={circle, fill=\sfStateMachinesResetColour, draw=none,
+                      minimum size=2.2mm, inner sep=0pt},
+  fsmreset/.style={draw=\sfStateMachinesResetColour, line width=\sfStateMachinesResetLinePt pt,
+                   -{Stealth[length=2.8mm,width=2.2mm]}, shorten >=0.4pt},
+  fsmcond/.style={font=\ttfamily\sfsize{\sfStateMachinesLabelSizePt}, text=textprimary,
+                  fill=bgpage, inner sep=1pt, align=center},
+  fsminput/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsWireLinePt pt,
+                   dash pattern=on 3pt off 2pt, -{Stealth[length=2.2mm,width=1.6mm]}},
+  fsmoutput/.style={fsminput},
+}
+% Outputs inside a state circle, below the name (Moore outputs).
+\newcommand{\fsmout}[1]{\\{\color{textsecondary}\sfsize{\sfStateMachinesLabelSizePt}#1}}
+% Legend: reset entry and transition; #1 = top left corner, e.g. (0,-3).
+\newcommand{\fsmlegend}[1]{%
+  \begin{scope}[shift={#1}]
+    \node[fsmresetdot] (fsmlgdot) at (0,0) {};
+    \draw[fsmreset] (fsmlgdot) -- (0.9,0);
+    \node[flowlabel, anchor=west] at (1.0,0) {reset};
+    \draw[fsmtrans] (0,-0.55) -- (0.9,-0.55);
+    \node[flowlabel, anchor=west] at (1.0,-0.55) {transition: condition / outputs};
+  \end{scope}}
+% Legend with the dashed inputs and outputs of the machine as well.
+\newcommand{\fsmlegendio}[1]{%
+  \fsmlegend{#1}%
+  \begin{scope}[shift={#1}]
+    \draw[fsminput] (0,-1.1) -- (0.9,-1.1);
+    \node[flowlabel, anchor=west] at (1.0,-1.1) {input or output signal};
+  \end{scope}}
 ===== END FILE =====

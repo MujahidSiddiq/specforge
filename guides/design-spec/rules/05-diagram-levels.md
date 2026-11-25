@@ -14,7 +14,7 @@ diagram shows (below).
 |---|---|---|
 | Signal | One RTL port or wire, single bit or bus | An arrow with its name. Detailed level: with its width |
 | Packet | A SystemVerilog struct type, an interface, or a group of fields that the inputs describe as one packet | **One** `packetarrow` labelled with the packet name. Its fields are never drawn; they are in the packet's table, and the caption or text names that table |
-| Information flow | Several signals that serve one purpose (high-level level only) | One `bundlearrow` labelled with what it carries, for example "write request" |
+| Information flow | Several signals that serve one purpose (high-level level only) | One `bundlearrow` with a `flowlabel` saying what it carries, for example "write request" |
 
 ## Detailed diagrams
 

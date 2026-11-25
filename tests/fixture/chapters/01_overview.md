@@ -29,3 +29,23 @@ Figure 1.2 shows the count in two cycles.
 ![Timing](../figures/fig-wave-evc.svg)
 
 **Figure 1.2.** Counting one event.
+
+## 1.2 Control
+
+The control state machine of Figure 1.3 has three states; Table 1.2 gives
+every transition.
+
+![Control state machine](../figures/fig-fsm-evc.svg)
+
+**Figure 1.3.** Control state machine. A state is kept when no transition condition holds.
+
+**Table 1.2.** Transitions of the control state machine.
+
+| Current state | Condition | Next state | Outputs |
+|---|---|---|---|
+| `IDLE` | `event` | `COUNT` | -- |
+| `COUNT` | `event && !full` | `COUNT` | `inc` = 1 |
+| `COUNT` | `clear` | `IDLE` | `done` = 1 |
+| `COUNT` | `stall` | `HOLD` | -- |
+| `HOLD` | `clear` (priority 2) | `IDLE` | -- |
+| `HOLD` | `!stall` | `COUNT` | -- |

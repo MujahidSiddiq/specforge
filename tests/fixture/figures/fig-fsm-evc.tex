@@ -1,0 +1,14 @@
+\begin{tikzpicture}
+  \node[fsmstate] (idle)  at (0,0)    {IDLE};
+  \node[fsmstate] (count) at (4,0)    {COUNT\fsmout{busy=1}};
+  \node[fsmstate] (hold)  at (4,-3.2) {HOLD\fsmout{busy=1}};
+  \node[fsmresetdot] (rst) at (-1.8,0) {};
+  \draw[fsmreset] (rst) -- node[fsmcond, above] {reset} (idle);
+  \draw[fsmtrans] (idle) to[bend left=20] node[fsmcond, above] {event} (count);
+  \draw[fsmtrans] (count) to[bend left=20] node[fsmcond, below] {clear / done=1} (idle);
+  \draw[fsmtrans] (count) to[bend left=20] node[fsmcond, right] {1: stall} (hold);
+  \draw[fsmtrans] (hold) to[bend left=20] node[fsmcond, left] {!stall} (count);
+  \draw[fsmtrans] (hold) to[bend left=30] node[fsmcond, below left] {2: clear} (idle);
+  \path[fsmtrans] (count) edge[loop above] node[fsmcond, above] {event \&\& !full / inc=1} (count);
+  \fsmlegend{(-1.8,-4.4)}
+\end{tikzpicture}
