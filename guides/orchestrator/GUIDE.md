@@ -25,12 +25,7 @@ Inside a guide, `rules/...` is relative to that guide.
    workspace with `project_rtl` and/or `project_description`, the settings
    from the user's message (diagram level, page maximum, title, short name,
    author, colours), and `specforge new`. An existing
-   `specforge_output/project.md` means the work has started. When you
-   cannot run commands, create the layout of `ARCHITECTURE.md` Section 6
-   yourself from `config-templates/project.md`, `config-templates/style.md`,
-   `templates/revision-history.md`, `templates/clarifications.md`,
-   `templates/status.md` and `styles/colour-record-template.md` (as
-   `colour-record.md`).
+   `specforge_output/project.md` means the work has started.
 2. **Read `status.md`** and continue from the step it records. Read the
    open questions in `clarifications.md`.
 3. **Check the framework version:** if `specforge_version` differs from

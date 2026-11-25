@@ -16,6 +16,10 @@ documents, a minor version for new features, a patch version for fixes.
   fitted by writing and layout; content is never left out without the
   user's approval.
 - `docs/` is removed; the README and `USER-GUIDE.md` replace it.
+- specforge is for Claude Code only: the chat route (`chat-pack`,
+  `unpack`, `bundle`, `specforge-chat.md`) and the cowork instructions are
+  removed, and `AGENTS.md` is replaced by `CLAUDE.md`. `check` now also
+  checks the input folders.
 
 ### Added
 

@@ -8,5 +8,4 @@ description: Write a complete design specification (PDF) of a hardware design fr
 The specforge folder, written `<specforge>` in every guide, is the folder
 that contains this `SKILL.md`.
 
-Read `START-HERE.md` in that folder and follow it. It is the same entry
-point that every other assistant uses.
+Read `START-HERE.md` in that folder and follow it.

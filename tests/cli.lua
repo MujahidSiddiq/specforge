@@ -57,23 +57,26 @@ return function(U, test, work, ROOT)
   U.write(d .. "/build/a.md", "# A\n")
   refused("input is the build folder", d, run("new", d, "--approach", "design-info", "--input", d .. "/build"))
 
+  -- a complete project that passes check; key is then set to value
   local function configured(approach, key, value, top)
     local dir = fresh() .. "/spec"
     local code
-    if approach == "rtl" then code = run("new", dir, "--approach", "rtl", "--input", rtl, "--top", top, "--title", "T", "--short", "T", "--author", "T")
-    else code = run("new", dir, "--approach", "design-info", "--input", info, "--title", "T", "--short", "T", "--author", "T") end
+    if approach == "rtl" then code = run("new", dir, "--approach", "rtl", "--input", rtl, "--top", top, "--diagrams", "detailed", "--title", "T", "--short", "T", "--author", "T")
+    else code = run("new", dir, "--approach", "design-info", "--input", info, "--diagrams", "detailed", "--title", "T", "--short", "T", "--author", "T") end
     test("valid project is created (" .. approach .. ")", code == 0)
-    local text = U.read(dir .. "/project.md"):gsub("\n  " .. key .. ":[^\n]*", "\n  " .. key .. ": " .. value, 1)
-    U.write(dir .. "/project.md", text)
+    U.write(dir .. "/chapters/01_a.md", "# 1. A\n\nText.\n")
+    if key then
+      local text = U.read(dir .. "/project.md"):gsub("\n  " .. key .. ":[^\n]*", "\n  " .. key .. ": " .. value, 1)
+      U.write(dir .. "/project.md", text)
+    end
     return dir
   end
-  local function no_pack(name, dir)
-    test(name .. ": refused", run("chat-pack", dir) ~= 0, "exit code 0")
-    test(name .. ": no pack written", not U.is_file(dir .. "/build/chat-pack.md"))
-  end
-  no_pack("pack of the project's parent", configured("design-info", "design_info", '".."'))
-  no_pack("pack of the project itself", configured("design-info", "design_info", '"."'))
-  no_pack("pack of notes that contain the project", configured("rtl", "notes", '".."', "top"))
+  local function no_check(name, dir) test(name .. ": refused", run("check", dir) ~= 0, "exit code 0") end
+  test("a complete project checks", run("check", configured("design-info")) == 0)
+  test("a complete RTL project checks", run("check", configured("rtl", nil, nil, "top")) == 0)
+  no_check("input is the project's parent", configured("design-info", "design_info", '".."'))
+  no_check("input is the project itself", configured("design-info", "design_info", '"."'))
+  no_check("notes contain the project", configured("rtl", "notes", '".."', "top"))
 
   d = fresh()
   U.write(d .. "/all/a.md", "# A\n")
@@ -96,9 +99,9 @@ return function(U, test, work, ROOT)
   refused("top is a package", p, run("new", p, "--approach", "rtl", "--top", "a_pkg", "--input", rtl))
   p = fresh() .. "/p"
   refused("notes do not exist", p, run("new", p, "--approach", "rtl", "--top", "top", "--input", rtl, "--notes", base .. "/none"))
-  no_pack("pack with a wrong notes path", configured("rtl", "notes", '"../no-such-notes"', "top"))
-  no_pack("pack with zero inputs", configured("design-info", "design_info", '"../../empty"'))
-  no_pack("pack with a wrong top", configured("rtl", "rtl_top", '"wrong"', "top"))
+  no_check("wrong notes path", configured("rtl", "notes", '"../no-such-notes"', "top"))
+  no_check("zero inputs", configured("design-info", "design_info", '"../../empty"'))
+  no_check("wrong top", configured("rtl", "rtl_top", '"wrong"', "top"))
 
   -- the diagram level
   p = fresh() .. "/p"
@@ -156,10 +159,11 @@ return function(U, test, work, ROOT)
 
   -- what worked must still work
   p = fresh() .. "/p"
-  test("default inputs folder", run("new", p, "--approach", "design-info", "--title", "T", "--short", "T", "--author", "T") == 0
+  test("default inputs folder", run("new", p, "--approach", "design-info", "--diagrams", "detailed", "--title", "T", "--short", "T", "--author", "T") == 0
     and U.is_dir(p .. "/inputs"))
   U.write(p .. "/inputs/a.md", "# A\n")
-  test("pack of the default folder", run("chat-pack", p) == 0 and U.is_file(p .. "/build/chat-pack.md"))
+  U.write(p .. "/chapters/01_a.md", "# 1. A\n\nText.\n")
+  test("check of the default folder", run("check", p) == 0)
   d = fresh()
   U.write(d .. "/design/a.md", "# A\n")
   test("sibling input", run("new", d .. "/design-spec", "--approach", "design-info", "--input", d .. "/design") == 0)

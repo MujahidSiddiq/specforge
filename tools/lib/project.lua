@@ -117,8 +117,8 @@ return function(U, Y, I)
   }
 
   -- Stops on an input or notes folder that is missing, empty or not separate
-  -- from the project. Whatever is in such a folder may be uploaded by
-  -- chat-pack, so it must never hold project files or earlier packs.
+  -- from the project: the AI reads everything in it as design input, so it
+  -- must never hold project files.
   function P.check_folder(root, dir, folder, kind, out_dir)
     local k = KINDS[kind]
     if U.is_file(folder) then U.fail("the %s must be a folder, and this is a file: %s", k.name, folder) end

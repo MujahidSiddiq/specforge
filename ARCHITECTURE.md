@@ -24,14 +24,14 @@
 | Configuration templates | `config-templates/` | Copied into each project: `project.md` (approach, inputs, diagram level, page maximum, document information), `style.md` (colours by plain name, overrides) |
 | Style defaults | `styles/style-defaults.md` | Default value of every styled element |
 | Base style rules | `styles/colour-guide.md` | Rules for colour, typography, layout and components that every document follows |
-| Entry points | `START-HERE.md`, `SKILL.md`, `AGENTS.md`, `specforge-chat.md` | One set of rules for code agents, cowork and chat |
+| Entry points | `START-HERE.md`, `SKILL.md`, `CLAUDE.md` | Instructions for Claude Code: writing a specification, or changing specforge |
 | Orchestrator guide | `guides/orchestrator/` | Runs the workflow and names the guide of each step |
 | Intake guides | `guides/intake-design-info/`, `guides/intake-rtl/` | Analyze the inputs of one approach; produce the analysis report and the questions |
 | Shared rules | `shared/` | Clarification rules and the information checklist |
 | Document-type guide | `guides/design-spec/` | Outline, page budget, content, diagram levels and acceptance of a design specification |
 | LaTeX guide | `guides/latex-document/` | How the PDF is produced and checked |
 | LaTeX template | `latex/` | Preamble, title page, TikZ style library |
-| Tool | `tools/`, started by `texlua tools/specforge.lua` or `specforge.sh` | Project setup, checks, build, RTL inventory, chat pack and unpack, doctor |
+| Tool | `tools/`, started by `texlua tools/specforge.lua` or `specforge.sh` | Project setup, checks, build, RTL inventory, doctor |
 | Tests | `tests/` | `texlua tests/run.lua`; the fixture is also used by `doctor --build` |
 | Record templates | `templates/` | Analysis report, clarification register, outline, revision history, review record |
 | Checklists | `checklists/` | Checks at intake, before a build, before a release |
@@ -128,7 +128,7 @@ folders are always separate from the project.
 | New RTL language | Add a rules file under `guides/intake-rtl/rules/` |
 | New style element | Add the key and its default to `styles/style-defaults.md`, use it in `latex/`, and document it in `config-templates/style.md` |
 
-After any change run `texlua tests/run.lua` and `specforge bundle`.
+After any change run `texlua tests/run.lua`.
 
 Every extension updates `CHANGELOG.md` and, if existing behaviour changes,
 the version in `VERSION`.

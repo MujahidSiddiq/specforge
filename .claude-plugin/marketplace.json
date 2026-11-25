@@ -7,7 +7,7 @@
     {
       "name": "specforge",
       "source": "./",
-      "description": "Lets an AI write a complete design specification (PDF) of a hardware design from RTL or a Markdown description: detailed or high-level diagrams, state machines, a page maximum, your own colours, and approval gates."
+      "description": "Lets Claude Code write a complete design specification (PDF) of a hardware design from RTL or a Markdown description: detailed or high-level diagrams, state machines, a page maximum, your own colours, and approval gates."
     }
   ]
 }

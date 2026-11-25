@@ -1,11 +1,11 @@
 # Specforge User Guide
 
 This guide takes a hardware engineer who has never used Specforge from an
-empty computer to a finished design specification. Your AI tool does the
+empty computer to a finished design specification. Claude Code does the
 work; you prepare one folder, send one prompt and approve the result. You
 do not need to know LaTeX.
 
-Written for Specforge 0.3.0. The commands are for Windows PowerShell; see
+The commands are for Windows PowerShell; see
 [Section 9](#9-macos-and-linux) for macOS and Linux.
 
 ## Contents
@@ -14,24 +14,24 @@ Written for Specforge 0.3.0. The commands are for Windows PowerShell; see
 - [2. Install LaTeX](#2-install-latex)
 - [3. Prepare your design folder](#3-prepare-your-design-folder)
 - [4. Check the computer](#4-check-the-computer)
-- [5. Start the AI](#5-start-the-ai)
+- [5. Start Claude Code](#5-start-claude-code)
 - [6. Your three approvals](#6-your-three-approvals)
 - [7. The result, and later changes](#7-the-result-and-later-changes)
 - [8. If something goes wrong](#8-if-something-goes-wrong)
 - [9. macOS and Linux](#9-macos-and-linux)
-- [10. What has been tested](#10-what-has-been-tested)
 
 ---
 
 ## 1. What you need
 
-- [ ] An AI tool that can read and write files: for example **Claude Code**
-      or **Claude Cowork**. Some tools need a paid plan.
-- [ ] **LaTeX** on your computer (free, Section 2), unless your AI tool can
-      build the PDF in its own environment.
-- [ ] Your design: RTL files, or a description in Markdown (`.md`) files.
-- [ ] **Permission to show your design to that AI service.** The AI company
-      receives what the AI reads. Ask your organization if you are not sure.
+- [ ] **Claude Code**, installed and signed in:
+      <https://code.claude.com/docs/en/quickstart>.
+- [ ] **LaTeX** on your computer (free, Section 2).
+- [ ] Your design: RTL files (SystemVerilog or Verilog), or a description
+      in Markdown (`.md`) files.
+- [ ] **Permission to show your design to the AI service.** Anthropic
+      receives what Claude Code reads. Ask your organization if you are
+      not sure.
 
 **How to use PowerShell:** press the Windows key, type `PowerShell`, open
 **Windows PowerShell** (not "as administrator"), paste a command with a
@@ -63,16 +63,14 @@ C:\designs\pulse-counter\
 
 Use simple folder names: letters, numbers, `-` and `_`.
 
-**Specforge:** with Git, run this, with the address of the Specforge
-repository in place of `OWNER/specforge`:
+**Specforge:** run this, with the address of the Specforge repository in
+place of `OWNER/specforge`:
 
 ```powershell
 git clone https://github.com/OWNER/specforge.git C:\designs\pulse-counter\specforge
 ```
 
-Without Git, download the ZIP from the repository page (**Code**, then
-**Download ZIP**), extract it, and rename the extracted folder to
-`specforge`. The folder must directly contain `START-HERE.md`.
+The folder must be named `specforge` and directly contain `START-HERE.md`.
 
 **Your design:** put the RTL in `project_rtl`, including packages and lower
 modules (test benches are not needed), or put Markdown files in
@@ -81,7 +79,8 @@ the description explains what the design is for.
 
 A good description covers purpose, blocks, every interface signal, clock
 and reset, behaviour, special cases (full, empty, errors, events in the
-same cycle), parameters and limits. Gaps are fine: the AI asks about them.
+same cycle), parameters and limits. Gaps are fine: Claude Code asks about
+them.
 
 To try Specforge first, create a small example design:
 
@@ -124,8 +123,8 @@ colours:
 ````
 
 The names you can use are listed in `specforge\config-templates\style.md`.
-You can also just write your colours in the prompt, or give the AI your own
-colour guide.
+You can also just write your colours in the prompt, or give Claude Code
+your own colour guide.
 
 ## 4. Check the computer
 
@@ -143,9 +142,9 @@ You can ignore a MiKTeX line about not having checked for updates. If you
 see `MISSING`, run the command again: MiKTeX may have installed the missing
 parts during the first run.
 
-## 5. Start the AI
+## 5. Start Claude Code
 
-**Claude Code:** in PowerShell, go to the design folder and start it:
+In PowerShell, go to the design folder and start Claude Code:
 
 ```powershell
 Set-Location "C:\designs\pulse-counter"
@@ -156,10 +155,6 @@ claude
 ```
 
 The first start asks you to sign in, and whether you trust the folder.
-Install Claude Code first if needed: <https://code.claude.com/docs/en/quickstart>.
-
-**Claude Cowork or another AI tool:** start a new task and share (connect)
-the design folder `C:\designs\pulse-counter`. Do not share your whole disk.
 
 **Then send this prompt:**
 
@@ -173,19 +168,19 @@ Pages: at most 15. Diagrams: detailed.
 - **Diagrams: detailed** shows every signal with its width.
   **Diagrams: high-level** shows the important signals and draws the rest
   as labelled information arrows. The text is complete either way.
-- Leave a setting out and the AI asks for it.
+- Leave a setting out and Claude Code asks for it.
 
-The AI asks before some actions. Usually: allow it to read the design
+Claude Code asks before some actions. Usually: allow it to read the design
 folder, to write in `specforge_output`, and to run the `specforge.lua`
 commands. Refuse changes to `project_rtl`, `project_description` or
 `specforge`, deletions, uploads and pushes you did not ask for.
 
 ## 6. Your three approvals
 
-The AI must stop and wait at each one.
+Claude Code must stop and wait at each one.
 
-**Approval 1: answer the questions.** The AI shows what it understood and
-asks numbered questions, each with a proposed answer. Check its
+**Approval 1: answer the questions.** Claude Code shows what it understood
+and asks numbered questions, each with a proposed answer. Check its
 understanding first, then reply, for example:
 
 ```text
@@ -196,20 +191,20 @@ understanding first, then reply, for example:
 
 Your answer becomes a fact in the specification, so read every default.
 
-**Approval 2: the outline.** The AI shows the chapters, figures and the
-estimated pages. Check that every block and behaviour has a place.
+**Approval 2: the outline.** Claude Code shows the chapters, figures and
+the estimated pages. Check that every block and behaviour has a place.
 
 ```text
 I approve the outline. Write the chapters and figures.
 ```
 
-If the complete design does not fit your page maximum, the AI tells you the
-smallest length it can reach. You choose: raise the maximum, or name
-content to leave out. It never drops content on its own.
+If the complete design does not fit your page maximum, Claude Code tells
+you the smallest length it can reach. You choose: raise the maximum, or
+name content to leave out. It never drops content on its own.
 
-**Approval 3: the PDF.** Read it yourself; an AI can make mistakes. Check
-the names, widths and directions of the signals, the clock and reset, every
-behaviour and priority, the state machines, and that nothing was invented.
+**Approval 3: the PDF.** Read it yourself. Check the names, widths and
+directions of the signals, the clock and reset, every behaviour and
+priority, the state machines, and that nothing was invented.
 
 ```text
 Do not release yet. Page <n>: <what is wrong> should be <what is correct>.
@@ -219,20 +214,20 @@ Do not release yet. Page <n>: <what is wrong> should be <what is correct>.
 I approve the release as revision 1.0 with status Released.
 ```
 
-If the AI does not wait at a step, send: "Stop. Follow the approval gates
-in the Specforge instructions."
+If Claude Code does not wait at a step, send: "Stop. Follow the approval
+gates in the Specforge instructions."
 
 ## 7. The result, and later changes
 
 The PDF is in `specforge_output\output\`, with the same text as a Markdown
 file. The project files that make it are in `specforge_output\`.
 
-- **Continue another day:** start the AI in the design folder again and
-  send: "Continue my specforge specification from its status." 
+- **Continue another day:** start Claude Code in the design folder again
+  and send: "Continue my specforge specification from its status."
 - **The design changed:** change your files, then send: "My design files
   changed. List what changed and which sections are affected, and wait for
   my approval."
-- **Different colours or diagram level:** ask the AI; it changes the
+- **Different colours or diagram level:** ask Claude Code; it changes the
   project settings and builds again.
 - **A new design:** a new design folder with its own copy of `specforge`.
 
@@ -243,9 +238,9 @@ file. The project files that make it are in `specforge_output\`.
 | `texlua` is not recognized | Install LaTeX (Section 2), then open a new PowerShell |
 | `MISSING` in the check | Run the check again; then follow what the line says |
 | The check cannot find `specforge.lua` | The folder must be named `specforge`, directly in the design folder, and contain `START-HERE.md` |
-| The AI says it cannot build | It gives you a build command: run it in PowerShell and give it the messages and the PDF |
+| Claude Code says LaTeX is missing | Install LaTeX (Section 2), then ask it to build again |
 | `is not UTF-8 text` | Open the file in Notepad and save it with encoding UTF-8 |
-| `top module ... not found`, or several candidates | Tell the AI the name of your top module |
+| `top module ... not found`, or several candidates | Tell Claude Code the name of your top module |
 | `Permission denied` while building | Close the PDF and build again |
 | `contrast check failed` | A colour is too light or too dark on its background: choose another |
 
@@ -256,15 +251,14 @@ run this in PowerShell; it works until you close the window:
 $env:Path += ";$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64"
 ```
 
-For any other problem, give the message to your AI and ask it to explain
-the cause in simple steps.
+For any other problem, give the message to Claude Code and ask it to
+explain the cause in simple steps.
 
 ## 9. macOS and Linux
 
-**Not yet tested.** Install MacTeX (<https://tug.org/mactex/>) on macOS, or
-TeX Live on Linux (Debian or Ubuntu:
-`sudo apt install texlive-full poppler-utils`). Open a new terminal, then
-check the computer:
+Install MacTeX (<https://tug.org/mactex/>) on macOS, or TeX Live on Linux
+(Debian or Ubuntu: `sudo apt install texlive-full poppler-utils`). Open a
+new terminal, then check the computer:
 
 ```sh
 sh ~/designs/pulse-counter/specforge/specforge.sh doctor --build
@@ -272,13 +266,3 @@ sh ~/designs/pulse-counter/specforge/specforge.sh doctor --build
 
 The folder layout, the prompt and the approvals are the same as on
 Windows. Start Claude Code with `cd ~/designs/pulse-counter` and `claude`.
-
-## 10. What has been tested
-
-| Item | State |
-|---|---|
-| Windows 11 with MiKTeX and Claude | Tested |
-| The commands and the example design in this guide | Tested |
-| A complete document of 0.3.0 written by an AI | Not yet |
-| macOS, Linux, TeX Live, other AI tools | Not yet |
-| VHDL | Not supported |

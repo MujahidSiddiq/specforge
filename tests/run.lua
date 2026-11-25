@@ -22,7 +22,6 @@ local S = module("style", U, Y, C)
 local M = module("md2tex", U)
 local F = module("figcheck", U)
 local B = module("build", U, P, S, M, F)
-local H = module("chat", U, P, I, F)
 local ROOT = U.normalize(here .. "/..")
 
 local passed, failed, serial = 0, 0, 0
@@ -212,23 +211,10 @@ local function inventory_and_projects()
   test("created project", p.title == "A & B" and p.rtl_top == "top" and P.input_dir(p) == U.normalize(rtl), P.input_dir(p))
   refuses("create twice", function() P.create(ROOT, dir, { approach = "design-info" }) end)
   refuses("create inside specforge", function() P.create(ROOT, ROOT .. "/zz-project", { approach = "design-info" }) end)
+  local input, notes = P.check_inputs(ROOT, p)
+  test("inputs checked", input == U.normalize(rtl) and notes == nil)
 
-  local pack, count = H.pack(ROOT, dir, true)
-  test("pack has numbered RTL", count == 1 and has(pack, "    1| ") and has(pack, "rtl-inventory.md"))
 
-  local function answer(path, body)
-    local f = work .. "/answer.txt"
-    U.write(f, "text\n````\n===== BEGIN FILE: " .. path .. " =====\n" .. body .. "\n===== END FILE =====\n````\n")
-    return f
-  end
-  for _, path in ipairs({ "../x.md", "chapters/../../x.md", "C:/x.md", "build/main.tex", "CLAUDE.md", ".git/config" }) do
-    refuses("unpack " .. path, function() H.unpack(dir, answer(path, "x")) end)
-  end
-  refuses("unpack bad figure", function() H.unpack(dir, answer("figures/fig-x.tex", "\\directlua{}")) end)
-  H.unpack(dir, answer("chapters/01_intro.md", "# 1. Intro"))
-  test("unpack writes", U.read(dir .. "/chapters/01_intro.md") == "# 1. Intro\n")
-  U.write(work .. "/cut.txt", "===== BEGIN FILE: status.md =====\nhalf")
-  refuses("unpack cut-off answer", function() H.unpack(dir, work .. "/cut.txt") end)
 end
 
 local function arguments()

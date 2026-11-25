@@ -33,7 +33,6 @@ local S = module("style", U, Y, C)
 local M = module("md2tex", U)
 local F = module("figcheck", U)
 local B = module("build", U, P, S, M, F)
-local H = module("chat", U, P, I, F)
 local ROOT = U.dirname(U.normalize(here))
 
 local HELP = [[
@@ -46,20 +45,14 @@ specforge <command> ...
         Without values it uses the layout <workspace>/specforge (this tool),
         project_rtl or project_description, and creates specforge_output
   check <project>
-        check configuration, style, chapters and figures; write the Markdown
+        check inputs, configuration, style, chapters and figures; write the Markdown
   build <project> [--figures]
         check, then build the PDF; --figures also writes the SVG previews
   inventory <project>
   inventory --rtl <folder> --top <module> [--out <file.md>]
         reading aid for SystemVerilog and Verilog RTL
-  chat-pack <project> [--no-inputs]
-        one file with the project and its inputs, to upload to a chat AI
-  unpack <project> <saved-answer.txt>
-        write the files contained in a saved chat answer
   doctor [--build]
         check this computer; --build also builds a test document
-  bundle [--check]
-        regenerate specforge-chat.md (after changing the framework)
   version
 ]]
 
@@ -68,10 +61,7 @@ local COMMANDS = {
   check = { min = 1, max = 1 },
   build = { min = 1, max = 1, flags = U.set({ "figures" }) },
   inventory = { max = 1, options = U.set({ "rtl", "top", "out" }) },
-  ["chat-pack"] = { min = 1, max = 1, flags = U.set({ "no-inputs" }) },
-  unpack = { min = 2, max = 2 },
   doctor = { flags = U.set({ "build" }) },
-  bundle = { flags = U.set({ "check" }) },
   version = {},
   help = {},
 }
@@ -96,7 +86,11 @@ function run.new(pos, opt)
   end
 end
 
-function run.check(pos) B.run(ROOT, project_dir(pos), { pdf = false, figures = false }) end
+function run.check(pos)
+  local dir = project_dir(pos)
+  P.check_inputs(ROOT, P.load(ROOT, dir, false))
+  B.run(ROOT, dir, { pdf = false, figures = false })
+end
 
 function run.build(pos, opt) B.run(ROOT, project_dir(pos), { pdf = true, figures = opt.figures }) end
 
@@ -113,32 +107,6 @@ function run.inventory(pos, opt)
   end
   local text = I.markdown(I.scan(folder), top)
   if out then U.write(out, text); U.say("Wrote " .. out) else io.stdout:write(text) end
-end
-
-run["chat-pack"] = function(pos, opt)
-  local dir = project_dir(pos)
-  local text, count = H.pack(ROOT, dir, not opt["no-inputs"])
-  local out = dir .. "/build/chat-pack.md"
-  U.write(out, text)
-  U.say(string.format("Wrote %s (%d input file(s), %d KB)", out, count, math.ceil(#text / 1024)))
-  U.say("It contains your design. Upload it only to an AI service you may share that design with.")
-end
-
-function run.unpack(pos)
-  local dir = project_dir(pos)
-  if not U.is_dir(dir) then U.fail("project folder not found: %s", dir) end
-  H.unpack(dir, U.abs(pos[2]))
-end
-
-function run.bundle(_, opt)
-  local path, text = ROOT .. "/specforge-chat.md", H.bundle(ROOT)
-  if opt.check then
-    if not U.is_file(path) or U.read(path) ~= text then U.fail("specforge-chat.md is out of date: run 'specforge bundle'") end
-    U.say("specforge-chat.md is up to date.")
-  else
-    U.write(path, text)
-    U.say(string.format("Wrote %s (%d KB)", path, math.ceil(#text / 1024)))
-  end
 end
 
 function run.doctor(_, opt)
