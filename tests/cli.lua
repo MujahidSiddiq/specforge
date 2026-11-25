@@ -100,6 +100,13 @@ return function(U, test, work, ROOT)
   no_pack("pack with zero inputs", configured("design-info", "design_info", '"../../empty"'))
   no_pack("pack with a wrong top", configured("rtl", "rtl_top", '"wrong"', "top"))
 
+  -- the diagram level
+  p = fresh() .. "/p"
+  refused("unknown --diagrams", p, run("new", p, "--approach", "design-info", "--diagrams", "medium"))
+  p = fresh() .. "/p"
+  test("--diagrams is written", run("new", p, "--approach", "design-info", "--diagrams", "high-level") == 0
+    and U.read(p .. "/project.md"):find('\ndiagrams: "high-level"', 1, true))
+
   -- what worked must still work
   p = fresh() .. "/p"
   test("default inputs folder", run("new", p, "--approach", "design-info", "--title", "T", "--short", "T", "--author", "T") == 0

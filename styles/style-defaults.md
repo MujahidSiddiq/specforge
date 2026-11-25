@@ -196,6 +196,8 @@ diagrams:                          # colour-guide.md Sections 5.4, 12
   control_wire_pt: 0.7             # control signals thin
   data_wire_pt: 1.7                # data and state signals thick
   bundle_pt: 1.3
+  packet_line_pt: 0.6              # each of the two lines of a packet arrow
+  packet_gap_pt: 1.6               # space between them
   highlight:                       # highlighted path, always labelled
     colour: accent_primary
     line_pt: 1.1

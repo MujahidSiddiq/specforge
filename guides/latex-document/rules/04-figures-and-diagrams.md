@@ -6,7 +6,9 @@
   through its source and sharp at any zoom. No screenshots or external
   images.
 - Draw a figure only when it shows something more clearly than text or a
-  table. The document-type guide says which figures a document needs.
+  table. The document-type guide says which figures a document needs, and
+  its diagram-level rule (`design-spec`, rule 05) says how much each block
+  diagram shows.
 - Understand the logical relationships first, then arrange the drawing.
   Technical accuracy is never traded for appearance.
 - When a figure is described by the user (blocks, positions, connections,
@@ -53,7 +55,8 @@ or font size directly in a figure.
 | External port on a boundary | `port` |
 | Connection, with arrow | `wire`, `sigarrow` |
 | Control signal (thin) / data or state signal (thick) | `ctrl`/`ctrlarrow`, `data`/`dataarrow` |
-| Bundle of signals | `bundle`, `bundlearrow` |
+| Bundle of signals, information flow | `bundle`, `bundlearrow` |
+| Packet (struct, interface): one arrow, never its fields | `packet`, `packetarrow` |
 | Highlighted path | `hlarrow` (always labelled) |
 | Junction | `junction`, `djunction` |
 | Signal name, width | `siglabel`, `widthlabel` |

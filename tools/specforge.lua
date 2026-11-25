@@ -41,6 +41,7 @@ specforge <command> ...
 
   new <project> --approach design-info|rtl [--input <folder>] [--top <module>]
                 [--notes <folder>] [--title <text>] [--short <name>] [--author <name>]
+                [--diagrams detailed|high-level]
         create a project folder; existing files are never overwritten
   check <project>
         check configuration, style, chapters and figures; write the Markdown
@@ -61,7 +62,7 @@ specforge <command> ...
 ]]
 
 local COMMANDS = {
-  new = { min = 1, max = 1, options = U.set({ "approach", "input", "top", "notes", "title", "short", "author" }) },
+  new = { min = 1, max = 1, options = U.set({ "approach", "input", "top", "notes", "title", "short", "author", "diagrams" }) },
   check = { min = 1, max = 1 },
   build = { min = 1, max = 1, flags = U.set({ "figures" }) },
   inventory = { max = 1, options = U.set({ "rtl", "top", "out" }) },

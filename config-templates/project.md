@@ -12,6 +12,8 @@ document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 
 approach: design-info             # design-info | rtl
 
+diagrams: ""                      # detailed | high-level (ask the user if not given)
+
 inputs:
   design_info: inputs/            # design-info: folder of Markdown files (*.md)
   rtl: inputs/rtl/                # rtl: folder of RTL files (*.sv, *.svh, *.v, *.vh)
@@ -46,6 +48,7 @@ page_budget:
 | Key | Required | Notes |
 |---|---|---|
 | `document_type` | yes | Selects the document-type guide. |
+| `diagrams` | yes | `detailed`: every signal with its width. `high-level`: important signals only, other connections as labelled information arrows. The text is the same for both. |
 | `approach` | yes | `design-info`: the design is described in Markdown files. `rtl`: the design is given as RTL. |
 | `inputs.rtl_top` | for `rtl` | The module the specification describes. |
 | `inputs.notes` | no | Answers intent questions in advance for the `rtl` approach. |

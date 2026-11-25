@@ -9,7 +9,8 @@
 %   ifgroup       interface-group box                  port      port square on a boundary
 %   wire          plain connection                     sigarrow  connection with arrow
 %   ctrl/ctrlarrow  control signal (thin)              data/dataarrow  data or state (thick)
-%   bundle/bundlearrow  signal bundle                  hlarrow   highlighted path (label it!)
+%   bundle/bundlearrow  signal bundle or information flow  hlarrow  highlighted path (label it!)
+%   packet/packetarrow  one packet (struct, interface): one arrow, no fields
 %   junction, djunction  wire junctions (thin, thick)  zoomline  zoom guide (dashed)
 %   siglabel  signal name     blockname / modname  block / module name
 %   blocksub  block sub-label grouptitle           group title     widthlabel  bus width
@@ -91,6 +92,11 @@
   bundle/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsBundlePt pt,
                  line cap=butt},
   bundlearrow/.style={bundle, -{Stealth[length=2.8mm,width=2.2mm]}},
+  % one packet (struct, interface, field group) as a whole: double line,
+  % open head; its fields are never drawn
+  packet/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsPacketLinePt pt,
+                 double=bgpage, double distance=\sfDiagramsPacketGapPt pt, line cap=butt},
+  packetarrow/.style={packet, -{Latex[open, length=3.4mm, width=3.2mm, line width=\sfDiagramsPacketLinePt pt]}},
   hlarrow/.style={draw=\sfDiagramsHighlightColour,
                   line width=\sfDiagramsHighlightLinePt pt, line join=round,
                   -{Stealth[length=2.5mm,width=1.9mm]}},

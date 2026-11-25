@@ -5,4 +5,6 @@
   \node[port] (in) at (0,1.5) {};
   \draw[sigarrow] (in) -- (2.5,1.5);
   \node[siglabel, left] at (-0.1,1.5) {\sig{event_i}};
+  \draw[packetarrow] (4.5,1.9) -- (7,1.9) node[siglabel, above, pos=0.45] {\sig{count_pkt}};
+  \draw[bundlearrow] (4.5,1.1) -- (7,1.1) node[siglabel, below, pos=0.45] {status};
 \end{tikzpicture}

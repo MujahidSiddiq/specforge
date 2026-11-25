@@ -28,6 +28,7 @@ return function(U, P, S, M, F)
       local function row(k, x) add("| " .. k .. " | " .. md_cell(x) .. " |") end
       row("Document type", p.subtitle)
       row("Design", p.title)
+      if p.diagrams then row("Diagram level", p.diagrams == "detailed" and "Detailed" or "High-level") end
       row("Revision", p.revision)
       row("Date", date)
       row("Author", p.author)

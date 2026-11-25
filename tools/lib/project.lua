@@ -5,6 +5,8 @@ return function(U, Y, I)
 
   P.APPROACHES = U.set({ "design-info", "rtl" })
 
+  P.DIAGRAMS = U.set({ "detailed", "high-level" })
+
   -- document_type -> defaults; high-level-spec is the name used by 0.2.
   P.TYPES = {
     ["design-spec"] = { subtitle = "Design Specification", file = "_Design_Specification" },
@@ -30,6 +32,7 @@ return function(U, Y, I)
       version = text(cfg, "specforge_version"),
       type = text(cfg, "document_type", ""),
       approach = text(cfg, "approach", ""),
+      diagrams = text(cfg, "diagrams"),
       design_info = text(cfg, "inputs.design_info", "inputs/"),
       rtl = text(cfg, "inputs.rtl", "inputs/rtl/"),
       rtl_top = text(cfg, "inputs.rtl_top"),
@@ -63,6 +66,12 @@ return function(U, Y, I)
     if not kind then bad[#bad + 1] = "document_type must be design-spec (is '" .. p.type .. "')" end
     kind = kind or P.TYPES["design-spec"]
     p.subtitle = p.subtitle or kind.subtitle
+    if p.type == "high-level-spec" then p.diagrams = p.diagrams or "high-level" end
+    if p.diagrams and not P.DIAGRAMS[p.diagrams] then
+      bad[#bad + 1] = "diagrams must be detailed or high-level (is '" .. p.diagrams .. "')"
+    elseif strict and not p.diagrams then
+      bad[#bad + 1] = "diagrams is empty: set detailed or high-level"
+    end
     if not P.APPROACHES[p.approach] then bad[#bad + 1] = "approach must be design-info or rtl (is '" .. p.approach .. "')" end
     if p.approach == "rtl" and not p.rtl_top then bad[#bad + 1] = "inputs.rtl_top is empty (required for rtl)" end
     if not p.min_pages or not p.max_pages then bad[#bad + 1] = "page_budget.min and max must be numbers" end
@@ -159,6 +168,7 @@ return function(U, Y, I)
     if U.is_file(dir .. "/project.md") then U.fail("%s already has a project.md; nothing was changed", dir) end
     if not P.APPROACHES[o.approach or ""] then U.fail("--approach must be design-info or rtl") end
     if o.approach == "rtl" and not o.top then U.fail("--top <module> is required for --approach rtl") end
+    if o.diagrams and not P.DIAGRAMS[o.diagrams] then U.fail("--diagrams must be detailed or high-level") end
 
     if o.short and o.short:find('[/\\:*?"<>|%c]') then
       U.fail('--short becomes part of the file name and cannot contain / \\ : * ? " < > |')
@@ -187,6 +197,7 @@ return function(U, Y, I)
 
     put("specforge_version", P.version(root))
     put("approach", o.approach)
+    put("diagrams", o.diagrams)
     put("rtl_top", o.top)
     if o.input then
       local rel = U.relative(dir, o.input) .. "/"

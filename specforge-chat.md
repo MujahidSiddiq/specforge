@@ -919,6 +919,69 @@ that do not, with the reason.
 - [ ] `revision-history.md` describes the change set.
 ===== END FILE =====
 
+===== BEGIN FILE: <specforge>/guides/design-spec/rules/05-diagram-levels.md =====
+# 05 - Diagram levels
+
+`diagrams` in `project.md` is `detailed` or `high-level`. It decides how
+much each block diagram shows. It never changes the text, the tables or
+the timing: every signal is in a table in both cases (`03-content.md`).
+
+State machines follow the notation of `latex-document` rule 04 at both
+levels; the level only changes how many states and transitions one
+diagram shows (below).
+
+## Signals and packets
+
+| Kind | What it is | Drawn as |
+|---|---|---|
+| Signal | One RTL port or wire, single bit or bus | An arrow with its name. Detailed level: with its width |
+| Packet | A SystemVerilog struct type, an interface, or a group of fields that the inputs describe as one packet | **One** `packetarrow` labelled with the packet name. Its fields are never drawn; they are in the packet's table, and the caption or text names that table |
+| Information flow | Several signals that serve one purpose (high-level level only) | One `bundlearrow` labelled with what it carries, for example "write request" |
+
+## Detailed diagrams
+
+- Show every sub-module of the block with its instance and module name.
+- Show **every signal** between the sub-modules and at the boundary, each
+  with its name and width as in the RTL: `\sig{data_i[31:0]}`, or with the
+  parameter: `\sig{data_i[W-1:0]}`. A single bit has no width.
+- Show each packet as one `packetarrow`, never its fields.
+- Clock and reset may be shown once at the boundary with the note that
+  they go to every sequential block, instead of one arrow per block.
+- Split a diagram that would become crowded: one diagram per sub-module,
+  or one per interface group. Crowded means labels below 8 pt after
+  scaling, or more than about 12 signals on one side of a block. Every
+  signal still appears in some diagram or table.
+
+## High-level diagrams
+
+- Show the sub-modules with their names.
+- Show a signal by name only when the reader needs it to follow the text:
+  - handshake and flow-control signals (`valid`, `ready`, `stall`, `full`),
+  - signals the behaviour chapters discuss by name,
+  - the outputs that are the design's main result.
+- Show all other connections as `bundlearrow`s between modules, labelled
+  with the kind of information they carry ("configuration", "status",
+  "read data").
+- Show packets as one `packetarrow` each, as at the detailed level.
+- In the text after the diagram, say which arrows group which signals, and
+  refer to the interface tables for the complete list.
+
+## State machines at each level
+
+| Level | One diagram shows |
+|---|---|
+| Detailed | Every state and every transition, with the exact condition (and outputs) as in the RTL or the design information |
+| High-level | Every state; transitions with the condition in words ("buffer full") where the exact expression is long. The transition table still gives every exact condition |
+
+A state machine with more than about 10 states is split at both levels:
+an overview of the state groups, then one diagram per group.
+
+## Legend
+
+Add a legend whenever a diagram uses more than one kind of arrow (signal,
+packet, information flow, control and data, state transition and reset).
+===== END FILE =====
+
 ===== BEGIN FILE: <specforge>/guides/latex-document/GUIDE.md =====
 # latex-document
 
@@ -1149,7 +1212,9 @@ is never styled in the chapter. There are no vertical rules.
   through its source and sharp at any zoom. No screenshots or external
   images.
 - Draw a figure only when it shows something more clearly than text or a
-  table. The document-type guide says which figures a document needs.
+  table. The document-type guide says which figures a document needs, and
+  its diagram-level rule (`design-spec`, rule 05) says how much each block
+  diagram shows.
 - Understand the logical relationships first, then arrange the drawing.
   Technical accuracy is never traded for appearance.
 - When a figure is described by the user (blocks, positions, connections,
@@ -1196,7 +1261,8 @@ or font size directly in a figure.
 | External port on a boundary | `port` |
 | Connection, with arrow | `wire`, `sigarrow` |
 | Control signal (thin) / data or state signal (thick) | `ctrl`/`ctrlarrow`, `data`/`dataarrow` |
-| Bundle of signals | `bundle`, `bundlearrow` |
+| Bundle of signals, information flow | `bundle`, `bundlearrow` |
+| Packet (struct, interface): one arrow, never its fields | `packet`, `packetarrow` |
 | Highlighted path | `hlarrow` (always labelled) |
 | Junction | `junction`, `djunction` |
 | Signal name, width | `siglabel`, `widthlabel` |
@@ -1536,6 +1602,8 @@ document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 
 approach: design-info             # design-info | rtl
 
+diagrams: ""                      # detailed | high-level (ask the user if not given)
+
 inputs:
   design_info: inputs/            # design-info: folder of Markdown files (*.md)
   rtl: inputs/rtl/                # rtl: folder of RTL files (*.sv, *.svh, *.v, *.vh)
@@ -1570,6 +1638,7 @@ page_budget:
 | Key | Required | Notes |
 |---|---|---|
 | `document_type` | yes | Selects the document-type guide. |
+| `diagrams` | yes | `detailed`: every signal with its width. `high-level`: important signals only, other connections as labelled information arrows. The text is the same for both. |
 | `approach` | yes | `design-info`: the design is described in Markdown files. `rtl`: the design is given as RTL. |
 | `inputs.rtl_top` | for `rtl` | The module the specification describes. |
 | `inputs.notes` | no | Answers intent questions in advance for the `rtl` approach. |
@@ -2132,6 +2201,8 @@ diagrams:                          # colour-guide.md Sections 5.4, 12
   control_wire_pt: 0.7             # control signals thin
   data_wire_pt: 1.7                # data and state signals thick
   bundle_pt: 1.3
+  packet_line_pt: 0.6              # each of the two lines of a packet arrow
+  packet_gap_pt: 1.6               # space between them
   highlight:                       # highlighted path, always labelled
     colour: accent_primary
     line_pt: 1.1
@@ -2292,7 +2363,8 @@ texlua and needs nothing else.
 %   ifgroup       interface-group box                  port      port square on a boundary
 %   wire          plain connection                     sigarrow  connection with arrow
 %   ctrl/ctrlarrow  control signal (thin)              data/dataarrow  data or state (thick)
-%   bundle/bundlearrow  signal bundle                  hlarrow   highlighted path (label it!)
+%   bundle/bundlearrow  signal bundle or information flow  hlarrow  highlighted path (label it!)
+%   packet/packetarrow  one packet (struct, interface): one arrow, no fields
 %   junction, djunction  wire junctions (thin, thick)  zoomline  zoom guide (dashed)
 %   siglabel  signal name     blockname / modname  block / module name
 %   blocksub  block sub-label grouptitle           group title     widthlabel  bus width
@@ -2374,6 +2446,11 @@ texlua and needs nothing else.
   bundle/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsBundlePt pt,
                  line cap=butt},
   bundlearrow/.style={bundle, -{Stealth[length=2.8mm,width=2.2mm]}},
+  % one packet (struct, interface, field group) as a whole: double line,
+  % open head; its fields are never drawn
+  packet/.style={draw=\sfDiagramsWireColour, line width=\sfDiagramsPacketLinePt pt,
+                 double=bgpage, double distance=\sfDiagramsPacketGapPt pt, line cap=butt},
+  packetarrow/.style={packet, -{Latex[open, length=3.4mm, width=3.2mm, line width=\sfDiagramsPacketLinePt pt]}},
   hlarrow/.style={draw=\sfDiagramsHighlightColour,
                   line width=\sfDiagramsHighlightLinePt pt, line join=round,
                   -{Stealth[length=2.5mm,width=1.9mm]}},

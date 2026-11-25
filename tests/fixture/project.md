@@ -4,6 +4,7 @@
 specforge_version: "0.2.1"
 document_type: design-spec
 approach: design-info
+diagrams: detailed
 document:
   title: "Event Counter (EVC) & test_100% #1"
   short_name: EVC

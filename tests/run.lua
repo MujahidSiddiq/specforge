@@ -92,6 +92,15 @@ local function configuration()
   local np = P.load(ROOT, fixture(), true)
   test("design specification defaults", np.file_name == "EVC_Design_Specification" and np.subtitle == "Design Specification")
   refuses("unknown document type", function() P.load(ROOT, typed("magic"), true) end)
+  local function level(text)
+    local dir = fixture()
+    U.write(dir .. "/project.md", (U.read(dir .. "/project.md"):gsub("diagrams: detailed", text)))
+    return dir
+  end
+  refuses("unknown diagram level", function() P.load(ROOT, level("diagrams: magic"), true) end)
+  refuses("diagram level needed for a build", function() P.load(ROOT, level('diagrams: ""'), true) end)
+  test("diagram level may wait until the build", P.load(ROOT, level('diagrams: ""'), false).diagrams == nil)
+  test("0.2 projects keep a given level", P.load(ROOT, typed("high-level-spec"), true).diagrams == "detailed")
   refuses("font injection", style("  fonts:\n    main: 'X}\\input{y}'"))
   refuses("font size injection", style("  captions:\n    font_size: 'small\\input{y}'"))
   refuses("separator injection", style("  captions:\n    label_separator: 'x}\\input{y}'"))
@@ -151,7 +160,7 @@ local function inventory_and_projects()
   refuses("unknown top", function() I.markdown(res, "nothing") end)
 
   local dir = work .. "/created"
-  P.create(ROOT, dir, { approach = "rtl", top = "top", input = rtl, title = "A & B", short = "AB", author = "T" })
+  P.create(ROOT, dir, { approach = "rtl", diagrams = "detailed", top = "top", input = rtl, title = "A & B", short = "AB", author = "T" })
   local p = P.load(ROOT, dir, true)
   test("created project", p.title == "A & B" and p.rtl_top == "top" and P.input_dir(p) == U.normalize(rtl), P.input_dir(p))
   refuses("create twice", function() P.create(ROOT, dir, { approach = "design-info" }) end)
@@ -206,7 +215,7 @@ local function full_build()
   U.run(totext, { "-enc", "UTF-8", pdf, work .. "/pdf.txt" })
   local t = U.read_bytes(work .. "/pdf.txt")
   for _, s in ipairs({ "duty_50%", "#(WIDTH)", "{msb,lsb}", "data}", "\\escaped.name", "ready | valid",
-    "x}\\textbf{INJECTED", "$clog2(DEPTH)", "[row]" }) do
+    "x}\\textbf{INJECTED", "$clog2(DEPTH)", "[row]", "Diagram level", "count_pkt" }) do
     test("PDF shows " .. s, has(t, s))
   end
   test("no doubled hash", not has(t, "##"))
