@@ -82,6 +82,16 @@ local function configuration()
   refuses("file name traversal", project("output:\n  file_name: ../x"))
   refuses("duplicate key", project("approach: rtl"))
   test("revision stays text", P.load(ROOT, fixture(), true).revision == "1.10")
+  local function typed(kind)
+    local dir = fixture()
+    U.write(dir .. "/project.md", (U.read(dir .. "/project.md"):gsub("design%-spec", kind)))
+    return dir
+  end
+  local lp = P.load(ROOT, typed("high-level-spec"), true)
+  test("0.2 document type still loads", lp.file_name == "EVC_High-Level_Specification" and lp.subtitle == "High-Level Specification")
+  local np = P.load(ROOT, fixture(), true)
+  test("design specification defaults", np.file_name == "EVC_Design_Specification" and np.subtitle == "Design Specification")
+  refuses("unknown document type", function() P.load(ROOT, typed("magic"), true) end)
   refuses("font injection", style("  fonts:\n    main: 'X}\\input{y}'"))
   refuses("font size injection", style("  captions:\n    font_size: 'small\\input{y}'"))
   refuses("separator injection", style("  captions:\n    label_separator: 'x}\\input{y}'"))
@@ -189,7 +199,7 @@ end
 local function full_build()
   local dir = fixture()
   B.run(ROOT, dir, { pdf = true, figures = U.which("pdftocairo") ~= nil })
-  local pdf = dir .. "/output/EVC_High-Level_Specification.pdf"
+  local pdf = dir .. "/output/EVC_Design_Specification.pdf"
   test("PDF built", U.is_file(pdf))
   local totext = U.which("pdftotext")
   if not totext then print("pdftotext not found: PDF text not checked"); return end

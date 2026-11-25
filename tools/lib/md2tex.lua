@@ -300,7 +300,7 @@ return function(U)
           add("\\subsection{" .. M.inline(t, true, where) .. "}")
           self.known["Section " .. want] = true
         else
-          U.fail("%s: heading level 4 is not used in a high-level specification", where)
+          U.fail("%s: heading level 4 is not used; split the section instead", where)
         end
       end
 

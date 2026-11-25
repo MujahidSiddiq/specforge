@@ -2,7 +2,7 @@
 
 ## What to extract
 
-Use the groups of `<specforge>/shared/hls-information-checklist.md`:
+Use the groups of `<specforge>/shared/information-checklist.md`:
 
 | Group | Look for |
 |---|---|

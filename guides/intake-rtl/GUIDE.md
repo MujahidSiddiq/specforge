@@ -12,7 +12,7 @@ the document itself and never changes the RTL.
 | Reads | `inputs.notes` folder (`*.md`, optional): the user's notes on purpose and intent |
 | Writes | `<project>/analysis.md`, `<project>/clarifications.md` |
 | Writes | `<project>/build/rtl-inventory.md` (generated reading aid) |
-| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/hls-information-checklist.md` |
+| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/information-checklist.md` |
 
 ## The central rule
 

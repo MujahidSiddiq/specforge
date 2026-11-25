@@ -5,7 +5,7 @@ its kind and source, and usually a question.
 
 ## Completeness
 
-Walk through `<specforge>/shared/hls-information-checklist.md` and mark each
+Walk through `<specforge>/shared/information-checklist.md` and mark each
 item given, partly given or missing. Typical gaps:
 
 - A signal without a direction, a width, a driver or a validity condition.

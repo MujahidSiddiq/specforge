@@ -1,7 +1,7 @@
 # latex-document
 
 The methodology and rules for producing a specforge document as a PDF. The
-document-type guide (for example `high-level-spec`) decides *what* the
+document-type guide (for example `design-spec`) decides *what* the
 document contains; this guide decides *how* it is written, drawn, built and
 checked.
 

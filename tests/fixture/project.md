@@ -2,7 +2,7 @@
 
 ```yaml
 specforge_version: "0.2.1"
-document_type: high-level-spec
+document_type: design-spec
 approach: design-info
 document:
   title: "Event Counter (EVC) & test_100% #1"

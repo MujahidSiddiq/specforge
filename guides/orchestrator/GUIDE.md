@@ -10,7 +10,7 @@ approval gate.
 |---|---|---|
 | `approach` | `design-info` | `guides/intake-design-info/GUIDE.md` |
 | `approach` | `rtl` | `guides/intake-rtl/GUIDE.md` |
-| `document_type` | `high-level-spec` | `guides/high-level-spec/GUIDE.md` |
+| `document_type` | `design-spec` (or `high-level-spec` from 0.2) | `guides/design-spec/GUIDE.md` |
 | (always) | | `guides/latex-document/GUIDE.md` for writing, drawing, building and checking |
 
 An unknown value stops the work with a message that names the supported
@@ -43,10 +43,10 @@ Inside a guide, `rules/...` is relative to that guide.
 | 1 Configure | Check `project.md` and `style.md`: run `specforge check <project>` once chapters exist, else read both files and report errors | `checklists/intake.md` | | Configured |
 | 2 Intake | Analyze the inputs; write `analysis.md` | intake guide | | Analyzed |
 | 3 Clarify | Ask the questions; record them | `shared/clarification-rules.md` | **Answers** | Clarified (date) |
-| 4 Outline | Write `outline.md` with the page estimate | `high-level-spec` rules 01, 02 | **Approval** | Outline approved (date) |
-| 5 Draft | Write chapters and figures, one chapter or a few at a time | `high-level-spec` rule 03, `latex-document` | Figures reviewed by the user | Drafting: chapters done |
+| 4 Outline | Write `outline.md` with the page estimate | `design-spec` rules 01, 02, 05 | **Approval** | Outline approved (date) |
+| 5 Draft | Write chapters and figures, one chapter or a few at a time | `design-spec` rule 03, `latex-document` | Figures reviewed by the user | Drafting: chapters done |
 | 6 Build | Run `specforge build <project> --figures`, or ask the user to | `latex-document` rule 06 | | Built (pages) |
-| 7 Verify | Build output, visual, technical checks; acceptance criteria | `latex-document` rule 06, `high-level-spec` rule 04, `checklists/pre-build.md` | | Verified |
+| 7 Verify | Build output, visual, technical checks; acceptance criteria | `latex-document` rule 06, `design-spec` rule 04, `checklists/pre-build.md` | | Verified |
 | 8 Release | Present the PDF; fix review findings; complete `checklists/pre-release.md`; update the revision history | `templates/review-record.md` | **Approval** | Released (revision, date) |
 
 Steps 2 and 3 repeat until nothing blocks the outline. During drafting,

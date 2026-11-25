@@ -22,7 +22,7 @@ so the user can confirm the understanding before anything is written.
 
 ## 3. Extracted information
 
-Grouped as in `<specforge>/shared/hls-information-checklist.md`. Every item
+Grouped as in `<specforge>/shared/information-checklist.md`. Every item
 has its source and state (confirmed / derived).
 
 ### 3.1 Structure
@@ -51,7 +51,7 @@ has its source and state (confirmed / derived).
 
 ## 4. Coverage
 
-The checklist of `<specforge>/shared/hls-information-checklist.md` with each
+The checklist of `<specforge>/shared/information-checklist.md` with each
 item marked **given**, **partly given** or **missing**, and the source.
 
 ## 5. Findings
@@ -67,6 +67,6 @@ The questions raised by the findings, as recorded in `clarifications.md`
 
 ## 7. Proposed document structure
 
-The behaviour flows found (see the high-level-spec guide,
+The behaviour flows found (see the design-spec guide,
 `rules/01-outline.md`) and a first estimate of the length, as input to the
 outline.

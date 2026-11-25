@@ -29,5 +29,5 @@
 ## Content
 
 - [ ] The acceptance criteria of the document type are met
-      (`guides/high-level-spec/rules/04-acceptance.md`).
+      (`guides/design-spec/rules/04-acceptance.md`).
 - [ ] `outline.md` matches the document.

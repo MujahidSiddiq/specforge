@@ -101,7 +101,7 @@ approval gate.
 |---|---|---|
 | `approach` | `design-info` | `guides/intake-design-info/GUIDE.md` |
 | `approach` | `rtl` | `guides/intake-rtl/GUIDE.md` |
-| `document_type` | `high-level-spec` | `guides/high-level-spec/GUIDE.md` |
+| `document_type` | `design-spec` (or `high-level-spec` from 0.2) | `guides/design-spec/GUIDE.md` |
 | (always) | | `guides/latex-document/GUIDE.md` for writing, drawing, building and checking |
 
 An unknown value stops the work with a message that names the supported
@@ -134,10 +134,10 @@ Inside a guide, `rules/...` is relative to that guide.
 | 1 Configure | Check `project.md` and `style.md`: run `specforge check <project>` once chapters exist, else read both files and report errors | `checklists/intake.md` | | Configured |
 | 2 Intake | Analyze the inputs; write `analysis.md` | intake guide | | Analyzed |
 | 3 Clarify | Ask the questions; record them | `shared/clarification-rules.md` | **Answers** | Clarified (date) |
-| 4 Outline | Write `outline.md` with the page estimate | `high-level-spec` rules 01, 02 | **Approval** | Outline approved (date) |
-| 5 Draft | Write chapters and figures, one chapter or a few at a time | `high-level-spec` rule 03, `latex-document` | Figures reviewed by the user | Drafting: chapters done |
+| 4 Outline | Write `outline.md` with the page estimate | `design-spec` rules 01, 02, 05 | **Approval** | Outline approved (date) |
+| 5 Draft | Write chapters and figures, one chapter or a few at a time | `design-spec` rule 03, `latex-document` | Figures reviewed by the user | Drafting: chapters done |
 | 6 Build | Run `specforge build <project> --figures`, or ask the user to | `latex-document` rule 06 | | Built (pages) |
-| 7 Verify | Build output, visual, technical checks; acceptance criteria | `latex-document` rule 06, `high-level-spec` rule 04, `checklists/pre-build.md` | | Verified |
+| 7 Verify | Build output, visual, technical checks; acceptance criteria | `latex-document` rule 06, `design-spec` rule 04, `checklists/pre-build.md` | | Verified |
 | 8 Release | Present the PDF; fix review findings; complete `checklists/pre-release.md`; update the revision history | `templates/review-record.md` | **Approval** | Released (revision, date) |
 
 Steps 2 and 3 repeat until nothing blocks the outline. During drafting,
@@ -201,7 +201,7 @@ into the document itself.
 | Reads | `inputs.design_info` folder of `project.md` (all `*.md`, in name order) |
 | Writes | `<project>/analysis.md` (from `<specforge>/templates/analysis.md`) |
 | Writes | Questions in `<project>/clarifications.md` (from `<specforge>/templates/clarifications.md`) |
-| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/hls-information-checklist.md` |
+| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/information-checklist.md` |
 
 The input files are the user's: never edit, rename or reformat them.
 
@@ -223,7 +223,7 @@ The input files are the user's: never edit, rename or reformat them.
    rules, and record them.
 7. **Stop** for the user's answers. Update the report with each answer.
    When nothing blocks the outline, hand over to the outline step
-   (high-level-spec guide).
+   (design-spec guide).
 
 ## Progressive inputs
 
@@ -239,7 +239,7 @@ new information affects and propose the changes before making them.
 
 ## What to extract
 
-Use the groups of `<specforge>/shared/hls-information-checklist.md`:
+Use the groups of `<specforge>/shared/information-checklist.md`:
 
 | Group | Look for |
 |---|---|
@@ -284,7 +284,7 @@ its kind and source, and usually a question.
 
 ## Completeness
 
-Walk through `<specforge>/shared/hls-information-checklist.md` and mark each
+Walk through `<specforge>/shared/information-checklist.md` and mark each
 item given, partly given or missing. Typical gaps:
 
 - A signal without a direction, a width, a driver or a validity condition.
@@ -341,7 +341,7 @@ the document itself and never changes the RTL.
 | Reads | `inputs.notes` folder (`*.md`, optional): the user's notes on purpose and intent |
 | Writes | `<project>/analysis.md`, `<project>/clarifications.md` |
 | Writes | `<project>/build/rtl-inventory.md` (generated reading aid) |
-| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/hls-information-checklist.md` |
+| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/information-checklist.md` |
 
 ## The central rule
 
@@ -399,9 +399,9 @@ is changed; the new RTL version is recorded in the references.
 ===== BEGIN FILE: <specforge>/guides/intake-rtl/rules/01-extraction.md =====
 # 01 - Extraction from RTL
 
-Read top-down from `inputs.rtl_top`. For a high-level specification, the
-hierarchy usually matters to two levels below the top; read deeper only to
-understand what a block does, not to document how.
+Read top-down from `inputs.rtl_top`, through every module of the
+hierarchy. The specification describes the whole design at the detail the
+RTL gives.
 
 ## What to extract
 
@@ -413,8 +413,8 @@ understand what a block does, not to document how.
 | Interface groups | Port names, shared prefixes, handshake pairs (`valid`/`ready`, `req`/`ack`) | Proposed groups, marked derived |
 | Parameters | `parameter`, `localparam`, packages | Name, default value, where it is used; derived widths separately |
 | Clocks and resets | Sensitivity lists of sequential blocks | Clock(s); reset signal, polarity, synchronous or asynchronous; which registers are reset and which are not |
-| Storage | Unpacked arrays, register files, FIFOs | Size, what is stored, how it is indexed (at a high level) |
-| State machines | Enumerated state types, `case` on a state register | States and the events that move between them (summarized) |
+| Storage | Unpacked arrays, register files, FIFOs | Size, what is stored, how it is indexed, reset value |
+| State machines | Enumerated state types, `case` on a state register | Every state with its encoding, the reset state, every transition with its condition and priority, and the outputs in each state or transition |
 | Operations | Output and register update logic | For each operation: trigger condition, effect, latency in cycles |
 | Priority | Order of `if`/`else` branches, `case` order | Which condition wins when several are true |
 | Boundary handling | Full, empty, wrap, overflow logic | Outcome of each case |
@@ -428,17 +428,16 @@ understand what a block does, not to document how.
 - Describe behaviour in the terms of the interfaces: "when `push` is high
   and the FIFO is not full, the entry is written in the same cycle and
   the count increases in the next cycle". Do not copy code.
-- Keep implementation detail in the report only where it explains a
-  behaviour; the specification will state the behaviour, not the code.
+- Record every detail the specification needs (widths, encodings, cycle
+  timing); the specification states it as behaviour, never as code.
 - Note dead code, unused ports, unconnected outputs and tied-off inputs as
   findings: they may be intended (reserved) or defects.
 
-## Depth limit
+## Packets
 
-Stop descending when a block's role and its behaviour at its ports are
-clear. Internal datapath details below that level are out of scope for a
-high-level specification; mention them only as "see the RTL" if the user
-wants that.
+Record each packet (struct type, interface, or group of fields used
+together) with its fields, widths and meaning. In diagrams it is drawn as
+one arrow; its fields go in a table.
 ===== END FILE =====
 
 ===== BEGIN FILE: <specforge>/guides/intake-rtl/rules/02-intent-questions.md =====
@@ -534,25 +533,28 @@ environment guarantees and boundary cases, but are still confirmed with the
 user before they become statements in the specification.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/guides/high-level-spec/GUIDE.md =====
-# high-level-spec
+===== BEGIN FILE: <specforge>/guides/design-spec/GUIDE.md =====
+# design-spec
 
-A **high-level specification** (HLS) says *what* a design does: its
-purpose, its organization into major blocks, its interfaces, and its
-behaviour as seen at those interfaces. It does not say *how* the design
-implements that behaviour: internal storage, pointer arithmetic,
-algorithms step by step, signal-level timing of internal paths. Those
-belong in a detailed design specification.
+A **design specification** describes a hardware design completely: its
+purpose, its organization, every interface signal, its storage and state
+machines, and its behaviour cycle by cycle where the inputs give it. A
+reader (an architect, an integrator, a verification engineer, a new team
+member) learns from it what the design is for, how to connect to it and
+how it behaves in every condition, without reading the RTL.
 
-A reader of the HLS (an architect, an integrator, a verification lead, a
-new team member) should, after 10 to 15 pages, know what the design is for,
-what it is made of, how to connect to it, and how it behaves in every
-operating condition, including the exceptional ones.
+The user chooses two things that change the form, never the content:
+
+| Setting in `project.md` | Values | Changes |
+|---|---|---|
+| `diagrams` | `detailed`, `high-level` | Only how much each diagram shows (`rules/05-diagram-levels.md`). The text, tables and timing are the same at both levels |
+| `page_budget.max` | a number of pages | The maximum length. The document is fitted by layout, never by leaving content out (`rules/02-page-budget.md`) |
 
 | Task | Read |
 |---|---|
-| Planning the outline and the page budget (workflow step 4) | `rules/01-outline.md`, `rules/02-page-budget.md` |
+| Planning the outline and the page estimate (workflow step 4) | `rules/01-outline.md`, `rules/02-page-budget.md` |
 | Writing a chapter | `rules/03-content.md` |
+| Planning or drawing any diagram | `rules/05-diagram-levels.md` |
 | Reviewing a draft or releasing it | `rules/04-acceptance.md` |
 
 How the document is written, drawn and built is defined by the
@@ -560,25 +562,31 @@ How the document is written, drawn and built is defined by the
 
 ## Rules that always apply
 
-1. **What, not how.** Every statement describes behaviour visible at a
-   block boundary or at the design's interfaces. When the inputs contain
-   implementation detail, the HLS states its effect and leaves the detail
-   out (or refers to the detailed specification, if there is one).
-2. **Complete at its level.** Every major block, every interface group and
-   every operating condition in the inputs appears in the HLS. Leaving out
-   detail is intended; leaving out a behaviour is an error.
-3. **The page budget is a requirement.** The outline allocates pages
-   before drafting; the draft is fitted to the budget, not the budget to
-   the draft. Exceeding `page_budget.max` needs the user's approval.
-4. **The outline is approved before drafting.** The outline (chapters,
+1. **Complete.** Every block, interface signal, parameter, storage
+   element, state machine, operation and condition that the inputs give is
+   in the document, at the level of detail the inputs give it.
+2. **Behaviour, not code.** Describe what the design does and when, in the
+   terms of its signals and blocks. Never copy RTL into the document.
+3. **The same text at every diagram level.** The `diagrams` setting
+   changes diagrams only. Never shorten the text, a table or a timing
+   description because the diagrams are high-level.
+4. **Fit by layout, not by omission.** The page maximum is met by
+   compact writing and layout. If the complete design does not fit, report
+   the smallest length you can reach and ask; never drop content on your
+   own.
+5. **The outline is approved before drafting.** The outline (chapters,
    sections, pages, figures, tables, sources) is written to the project's
    `outline.md` and approved by the user.
-5. **Nothing invented.** A behaviour that the inputs do not settle is a
+6. **Nothing invented.** A behaviour that the inputs do not settle is a
    question in `clarifications.md`; if it stays open, it is an open point
    in the document.
+
+Projects made with specforge 0.2 have `document_type: high-level-spec`.
+They still build. Writing new content for such a project follows this
+guide; ask the user before changing the type in `project.md`.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/guides/high-level-spec/rules/01-outline.md =====
+===== BEGIN FILE: <specforge>/guides/design-spec/rules/01-outline.md =====
 # 01 - Outline
 
 ## Generic outline
@@ -586,12 +594,13 @@ How the document is written, drawn and built is defined by the
 | # | Chapter | Status | Sections (typical) |
 |---|---|---|---|
 | 1 | Introduction | Required | Purpose and scope; relationship with other documents; terminology |
-| 2 | Design Overview | Required | Top-level organization; organization of each major block; configuration parameters |
-| 3 | Interfaces | Required | External interface groups; interfaces between the major blocks |
-| 4 to K | Behaviour chapters | Required, 2 to 5 chapters | One chapter per main operation or flow (see below) |
-| K+1 | Exceptional Conditions | Required if the design has any | Reset, flush, full or empty conditions, errors, simultaneous operations and priority |
-| K+2 | Constraints, Assumptions and Limitations | Required | Assumptions on the environment, guarantees, open points, known limitations |
-| K+3 | References | Required | Input documents and related documents |
+| 2 | Design Overview | Required | Top-level organization; organization of each block down to the leaf modules; configuration parameters and derived values |
+| 3 | Interfaces | Required | Every external signal, grouped; every interface between blocks; protocols with timing |
+| 4 to K | Behaviour chapters | Required | One chapter per main operation or flow (see below) |
+| K+1 to L | Block chapters | When a block has internals the flows do not explain | One chapter per block: storage, state machines, datapath, internal timing |
+| L+1 | Exceptional Conditions | Required if the design has any | Reset, flush, full or empty conditions, errors, simultaneous operations and priority |
+| L+2 | Constraints, Assumptions and Limitations | Required | Assumptions on the environment, guarantees, open points, known limitations |
+| L+3 | References | Required | Input documents and related documents |
 
 Front matter (title page, document information, revision history,
 contents) is generated by the build and is not part of the outline's
@@ -603,8 +612,7 @@ chapter keeps its role.
 
 ## Behaviour chapters
 
-The behaviour chapters carry the design-specific content. Derive them from
-the inputs:
+The behaviour chapters describe what the design does, flow by flow:
 
 1. List every operation the design performs and every condition it reacts
    to (from the design information, or from the RTL and the answers to the
@@ -612,39 +620,44 @@ the inputs:
 2. Group them into **flows**: sequences that a reader follows from a cause
    at an interface to its visible effect. Typical flows are the normal
    operation, the tracking or bookkeeping of state, the completion or
-   retirement of work, and recovery from an error, cancel or
-   redirect.
+   retirement of work, and recovery from an error, cancel or redirect.
 3. Order the chapters as the reader meets the flows: normal operation
    first, then state tracking and completion, then recovery.
-4. Aim for 2 to 5 behaviour chapters. More than 5 means the flows are cut
-   too fine: merge them. One chapter that holds everything means the flows
-   are not separated: split it.
+4. More than about six behaviour chapters means the flows are cut too fine:
+   merge them. One chapter that holds everything means the flows are not
+   separated: split it.
 5. Conditions that interrupt every flow (reset, flush, simultaneous
-   operations) go to the Exceptional Conditions chapter, not into each
-   behaviour chapter. A condition that belongs to one flow only stays in
-   that flow's chapter.
+   operations) go to the Exceptional Conditions chapter. A condition that
+   belongs to one flow only stays in that flow's chapter.
+
+## Block chapters
+
+A block chapter holds what belongs to one block and no flow explains on
+its own: its storage organization, its state machines (diagram and
+transition table), its datapath and its internal cycle timing. A flow
+chapter refers to it instead of repeating it. Small blocks are described
+completely in the Design Overview and need no chapter.
 
 ## Optional sections
 
 | Section | Include when |
 |---|---|
 | Terminology table | The document uses more than about five terms a reader may not know |
-| Configuration parameters | The design has parameters that change its size or behaviour |
 | Worked example | One flow is hard to follow from prose alone (typically recovery); place it at the end of that flow's chapter |
-| Timing diagram | The order of events across cycles is part of the behaviour the reader must know; at most one or two in the document |
-| Relationship with other documents | A detailed specification or a parent specification exists |
+| Relationship with other documents | A parent or related specification exists |
 
 ## Outline file
 
 Write the outline to `<project>/outline.md` with
 `<specforge>/templates/outline.md`: every chapter and section with its page
 allocation, every planned figure and table with its purpose, and the input
-sources (files, sections, clarification IDs) behind each section. The user
-approves it before drafting starts. Later changes to the structure go back
-through the outline.
+sources (files, sections, clarification IDs) behind each section. State
+the diagram level and the page estimate. The user approves it before
+drafting starts. Later changes to the structure go back through the
+outline.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/guides/high-level-spec/rules/02-page-budget.md =====
+===== BEGIN FILE: <specforge>/guides/design-spec/rules/02-page-budget.md =====
 # 02 - Page budget
 
 ## Target
@@ -749,65 +762,79 @@ A document below `page_budget.min` is not padded: check that nothing from
 the inputs is missing, and report the shortfall.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/guides/high-level-spec/rules/03-content.md =====
+===== BEGIN FILE: <specforge>/guides/design-spec/rules/03-content.md =====
 # 03 - Content per chapter
+
+Describe everything the inputs give, at the detail they give it. The
+diagram level never changes this text.
 
 ## 1 Introduction
 
 - **Purpose and scope:** what the design is for, where it sits in the
-  surrounding system, and what this document covers. State explicitly what
-  is out of scope (for example internal implementation, which belongs in
-  the detailed specification).
-- **Relationship with other documents:** when a detailed or parent
-  specification exists: this document says *what*, the other says *how*;
-  name the document and its revision.
+  surrounding system, and what this document covers.
+- **Relationship with other documents:** name any parent or related
+  specification and its revision.
 - **Terminology:** a table of the terms the reader needs, defined in one
   sentence each.
 
 ## 2 Design Overview
 
-- One **hierarchy diagram** per level: the top level with its major blocks,
-  then one diagram per major block with its sub-blocks. Together the
-  diagrams establish the complete hierarchy down to the level the HLS
-  describes, and no further.
-- Each diagram shows the blocks, the main connections between them
-  (grouped, not every signal) and the external interfaces at the boundary.
-  It distinguishes external from internal interfaces, and control from
-  data where that helps.
-- After each diagram, describe each block in a few sentences: its
-  responsibility, what it receives, what it provides.
-- **Configuration parameters:** a table with name, meaning, default or
-  minimum value, and the constraints on the value.
-- Do not repeat the same architecture in later chapters; later figures are
-  behavioural (examples, timing), not further block diagrams.
+- One **hierarchy diagram** per level, from the top level down to the leaf
+  modules that the inputs describe. Draw each at the chosen diagram level
+  (`05-diagram-levels.md`).
+- After each diagram, describe each block: its responsibility, what it
+  receives, what it provides, and which chapter describes it further.
+- **Configuration parameters:** a table with name, meaning, default value,
+  allowed values and the constraints on the value. List the derived values
+  (widths, depths) with how each is derived.
+- Do not repeat the same organization in later chapters; later figures are
+  behavioural (state machines, examples, timing).
 
 ## 3 Interfaces
 
-- Group the external signals by function (for example clock and reset,
-  input transactions, control, status, outputs). For each group: direction,
-  purpose, and the condition under which it carries valid information.
-- Describe the interfaces between the major blocks the same way.
-- State the responsibility on each side: what the sender guarantees, what
-  the receiver does in response.
-- Signal names may appear where the reader needs them; full signal lists
-  with widths belong in the detailed specification (or, without one, in a
-  compact table here).
+- **Every external signal**, grouped by function (clock and reset,
+  transactions, control, status). For each signal: name, width, direction,
+  and description, including when it is valid, its reset value if any, and
+  the encoding of each value it can take.
+- The same for every interface between blocks.
+- A **packet** (a SystemVerilog struct, an interface, or a group of fields
+  that the inputs describe as one packet) has its own table of fields with
+  widths and meaning.
+- **Protocols:** handshakes, ordering and latency, with a timing diagram
+  for each protocol that has more than one cycle.
+- State the responsibility on each side: what the sender guarantees and
+  what the receiver does in response.
 
 ## Behaviour chapters
 
 For each flow:
 
 - **Trigger:** the interface event or condition that starts it.
-- **Effect:** what changes in the design's visible state and outputs, in
-  order.
-- **Timing:** only at the level the user of the design must know ("in the
-  same cycle", "from the next cycle", "after N cycles"). Internal
-  cycle-by-cycle timing belongs in the detailed specification.
-- **Boundary cases:** empty, full, wrap-around, no-op cases of this flow,
-  each with its outcome.
+- **Effect:** what changes in the design's state and outputs, in order.
+- **Timing:** in which cycle each change happens, as far as the inputs
+  give it. Use a timing diagram where the order across cycles matters.
+- **Priority:** which condition wins when several are true.
+- **Boundary cases:** empty, full, wrap-around and no-op cases of the
+  flow, each with its outcome.
 - **Interaction:** how this flow hands over to other flows.
-- A worked example or timing diagram only where the prose is not enough;
-  see `01-outline.md`.
+- A worked example where the prose is hard to follow.
+
+## Block chapters
+
+- **Storage:** every register, array, FIFO and memory: size, what is
+  stored, how it is indexed, reset value.
+- **State machines:** every state machine, with a state diagram
+  (`latex-document`, rule 04) and a transition table:
+
+  | Current state | Condition | Next state | Outputs |
+  |---|---|---|---|
+
+  Add a priority column when conditions can be true at the same time.
+  Give the encoding of each state and the reset state. Name the outputs
+  that depend on the state only and those that also depend on inputs.
+- **Datapath:** what is computed, from which inputs, in which cycle;
+  algorithms as numbered steps.
+- **Internal timing:** cycle by cycle where the inputs give it.
 
 ## Exceptional Conditions
 
@@ -823,12 +850,11 @@ For each flow:
 ## Constraints, Assumptions and Limitations
 
 - **Assumptions and guarantees:** what the design requires of its
-  environment (input protocols, combinations that never occur) and what it
-  guarantees in return.
+  environment and what it guarantees in return.
 - **Open points:** every open point in the document, with its ID and a
   one-line summary, or the statement that none remain.
 - **Known limitations:** behaviours that are by design not handled or not
-  detected, with their effect, so that the reader can judge the risk.
+  detected, with their effect.
 
 ## References
 
@@ -836,19 +862,14 @@ The input documents (with revision or date) and related documents. For the
 `rtl` approach: the RTL files and the version (commit or tag) the document
 describes.
 
-## Level of detail: in or out
+## What is not in the document
 
-| In the HLS | Out of the HLS (detailed specification) |
-|---|---|
-| Block responsibilities | Internal storage organization |
-| Interface groups, direction, purpose | Every signal with width and encoding |
-| Behaviour visible at block boundaries | Pointer arithmetic, internal state machines |
-| Outcome of boundary cases | Algorithms step by step |
-| Timing the user of the design must know | Internal cycle-by-cycle timing |
-| Configuration parameters and limits | Derived widths and internal constants |
+- RTL code. Describe behaviour, do not copy code.
+- Anything the inputs do not give: no guessed timing, encoding or width.
+  Ask, or write an open point.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/guides/high-level-spec/rules/04-acceptance.md =====
+===== BEGIN FILE: <specforge>/guides/design-spec/rules/04-acceptance.md =====
 # 04 - Acceptance criteria
 
 A draft is ready for the user's review when all of these hold. Report any
@@ -856,12 +877,17 @@ that do not, with the reason.
 
 ## Coverage
 
-- [ ] Every major block in the inputs appears in a hierarchy diagram and is
-      described in Chapter 2.
-- [ ] Every external interface group appears in Chapter 3 with direction,
-      purpose and validity condition.
+- [ ] Every block in the inputs appears in a hierarchy diagram and is
+      described.
+- [ ] Every external signal and every interface between blocks is in a
+      table with width, direction and description.
+- [ ] Every packet has a table of its fields.
+- [ ] Every state machine has a state diagram and a transition table with
+      its reset state.
+- [ ] Every storage element is described.
 - [ ] Every operation and condition in the inputs is covered by a
-      behaviour chapter or the Exceptional Conditions chapter.
+      behaviour chapter, a block chapter or the Exceptional Conditions
+      chapter, with its timing as far as the inputs give it.
 - [ ] Every boundary case named in the inputs has its outcome stated.
 - [ ] Every combination of simultaneous operations the interfaces allow is
       covered (outcome or guarantee that it does not occur).
@@ -875,13 +901,14 @@ that do not, with the reason.
 - [ ] Names, terms and numbers are the same in text, tables and figures.
 - [ ] No chapter contradicts another.
 
-## Level and length
+## Diagram level and length
 
-- [ ] No implementation detail beyond the "in the HLS" column of
-      `03-content.md`.
-- [ ] The page count is within `page_budget`, or the user approved the
-      exception.
-- [ ] No architecture is repeated: later figures are behavioural.
+- [ ] Every diagram follows the chosen level (`05-diagram-levels.md`).
+- [ ] The text is complete regardless of the diagram level.
+- [ ] The page count is at most `page_budget.max`, or the user approved
+      the reported minimum length.
+- [ ] No content was left out to fit the page maximum without the user's
+      approval.
 
 ## Form
 
@@ -896,7 +923,7 @@ that do not, with the reason.
 # latex-document
 
 The methodology and rules for producing a specforge document as a PDF. The
-document-type guide (for example `high-level-spec`) decides *what* the
+document-type guide (for example `design-spec`) decides *what* the
 document contains; this guide decides *how* it is written, drawn, built and
 checked.
 
@@ -1431,8 +1458,8 @@ change: impact first, the user's approval, then the edit and a revision
 history entry.
 ===== END FILE =====
 
-===== BEGIN FILE: <specforge>/shared/hls-information-checklist.md =====
-# Information a high-level specification needs
+===== BEGIN FILE: <specforge>/shared/information-checklist.md =====
+# Information a design specification needs
 
 Used by both intake guides to find what the inputs do not say. For each
 item, the analysis report records whether the inputs give it (with the
@@ -1450,8 +1477,7 @@ become questions.
 
 - [ ] The top-level module name.
 - [ ] The major blocks and, for each, its responsibility.
-- [ ] The hierarchy down to the level the HLS describes (usually two
-      levels below the top).
+- [ ] The hierarchy down to the leaf modules.
 - [ ] The main connections between the blocks, grouped by function.
 - [ ] Configuration parameters: meaning, default, allowed range or
       constraints.
@@ -1506,7 +1532,7 @@ default" where a default is given.
 ```yaml
 specforge_version: "0.2.1"        # framework version this project is built with
 
-document_type: high-level-spec    # only value supported now: high-level-spec
+document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 
 approach: design-info             # design-info | rtl
 
@@ -1518,13 +1544,13 @@ inputs:
 
 output:
   dir: output/                    # PDF and combined Markdown go here
-  file_name: ""                   # default: <short_name>_High-Level_Specification
+  file_name: ""                   # default: <short_name>_Design_Specification
   combined_markdown: true         # also write one complete Markdown file
 
 document:
   title: ""                       # full design name, e.g. "Example Unit (EXU)"
   short_name: ""                  # short name used in file names, e.g. "EXU"
-  subtitle: High-Level Specification
+  subtitle: Design Specification
   author: ""
   organization: ""                # optional; shown on the title page if given
   revision: "0.1"
@@ -1616,7 +1642,7 @@ so the user can confirm the understanding before anything is written.
 
 ## 3. Extracted information
 
-Grouped as in `<specforge>/shared/hls-information-checklist.md`. Every item
+Grouped as in `<specforge>/shared/information-checklist.md`. Every item
 has its source and state (confirmed / derived).
 
 ### 3.1 Structure
@@ -1645,7 +1671,7 @@ has its source and state (confirmed / derived).
 
 ## 4. Coverage
 
-The checklist of `<specforge>/shared/hls-information-checklist.md` with each
+The checklist of `<specforge>/shared/information-checklist.md` with each
 item marked **given**, **partly given** or **missing**, and the source.
 
 ## 5. Findings
@@ -1661,7 +1687,7 @@ The questions raised by the findings, as recorded in `clarifications.md`
 
 ## 7. Proposed document structure
 
-The behaviour flows found (see the high-level-spec guide,
+The behaviour flows found (see the design-spec guide,
 `rules/01-outline.md`) and a first estimate of the length, as input to the
 outline.
 ===== END FILE =====
@@ -1700,8 +1726,9 @@ is made here first.
 
 | Item | Value |
 |---|---|
-| Document type | high-level-spec |
-| Page budget | <min> to <max> pages |
+| Document type | design-spec |
+| Diagram level | detailed / high-level |
+| Page maximum | <max> pages |
 | Estimated length | <pages> (see the estimate below) |
 | Status | Proposed / Approved on <date> |
 
@@ -1734,7 +1761,7 @@ IDs behind the section.
 
 ## Estimate
 
-Show the calculation of `guides/high-level-spec/rules/02-page-budget.md`
+Show the calculation of `guides/design-spec/rules/02-page-budget.md`
 with the counts used (major blocks, interface groups, behaviour chapters,
 worked examples, timing diagrams), and the budget-fitting steps applied.
 ===== END FILE =====
@@ -1835,7 +1862,7 @@ One line per session or step, newest last: date, what was done.
 - [ ] For `rtl`: the RTL version (commit, tag or date) is recorded and the
       inventory was run.
 - [ ] Every extracted fact has a source and a state (confirmed or derived).
-- [ ] Every item of `shared/hls-information-checklist.md` is marked given,
+- [ ] Every item of `shared/information-checklist.md` is marked given,
       partly given or missing.
 - [ ] Contradictions, ambiguities and naming problems are listed as
       findings.
@@ -1882,7 +1909,7 @@ One line per session or step, newest last: date, what was done.
 ## Content
 
 - [ ] The acceptance criteria of the document type are met
-      (`guides/high-level-spec/rules/04-acceptance.md`).
+      (`guides/design-spec/rules/04-acceptance.md`).
 - [ ] `outline.md` matches the document.
 ===== END FILE =====
 

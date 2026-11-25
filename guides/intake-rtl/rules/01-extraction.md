@@ -1,8 +1,8 @@
 # 01 - Extraction from RTL
 
-Read top-down from `inputs.rtl_top`. For a high-level specification, the
-hierarchy usually matters to two levels below the top; read deeper only to
-understand what a block does, not to document how.
+Read top-down from `inputs.rtl_top`, through every module of the
+hierarchy. The specification describes the whole design at the detail the
+RTL gives.
 
 ## What to extract
 
@@ -14,8 +14,8 @@ understand what a block does, not to document how.
 | Interface groups | Port names, shared prefixes, handshake pairs (`valid`/`ready`, `req`/`ack`) | Proposed groups, marked derived |
 | Parameters | `parameter`, `localparam`, packages | Name, default value, where it is used; derived widths separately |
 | Clocks and resets | Sensitivity lists of sequential blocks | Clock(s); reset signal, polarity, synchronous or asynchronous; which registers are reset and which are not |
-| Storage | Unpacked arrays, register files, FIFOs | Size, what is stored, how it is indexed (at a high level) |
-| State machines | Enumerated state types, `case` on a state register | States and the events that move between them (summarized) |
+| Storage | Unpacked arrays, register files, FIFOs | Size, what is stored, how it is indexed, reset value |
+| State machines | Enumerated state types, `case` on a state register | Every state with its encoding, the reset state, every transition with its condition and priority, and the outputs in each state or transition |
 | Operations | Output and register update logic | For each operation: trigger condition, effect, latency in cycles |
 | Priority | Order of `if`/`else` branches, `case` order | Which condition wins when several are true |
 | Boundary handling | Full, empty, wrap, overflow logic | Outcome of each case |
@@ -29,14 +29,13 @@ understand what a block does, not to document how.
 - Describe behaviour in the terms of the interfaces: "when `push` is high
   and the FIFO is not full, the entry is written in the same cycle and
   the count increases in the next cycle". Do not copy code.
-- Keep implementation detail in the report only where it explains a
-  behaviour; the specification will state the behaviour, not the code.
+- Record every detail the specification needs (widths, encodings, cycle
+  timing); the specification states it as behaviour, never as code.
 - Note dead code, unused ports, unconnected outputs and tied-off inputs as
   findings: they may be intended (reserved) or defects.
 
-## Depth limit
+## Packets
 
-Stop descending when a block's role and its behaviour at its ports are
-clear. Internal datapath details below that level are out of scope for a
-high-level specification; mention them only as "see the RTL" if the user
-wants that.
+Record each packet (struct type, interface, or group of fields used
+together) with its fields, widths and meaning. In diagrams it is drawn as
+one arrow; its fields go in a table.

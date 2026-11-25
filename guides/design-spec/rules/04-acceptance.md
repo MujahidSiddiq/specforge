@@ -5,12 +5,17 @@ that do not, with the reason.
 
 ## Coverage
 
-- [ ] Every major block in the inputs appears in a hierarchy diagram and is
-      described in Chapter 2.
-- [ ] Every external interface group appears in Chapter 3 with direction,
-      purpose and validity condition.
+- [ ] Every block in the inputs appears in a hierarchy diagram and is
+      described.
+- [ ] Every external signal and every interface between blocks is in a
+      table with width, direction and description.
+- [ ] Every packet has a table of its fields.
+- [ ] Every state machine has a state diagram and a transition table with
+      its reset state.
+- [ ] Every storage element is described.
 - [ ] Every operation and condition in the inputs is covered by a
-      behaviour chapter or the Exceptional Conditions chapter.
+      behaviour chapter, a block chapter or the Exceptional Conditions
+      chapter, with its timing as far as the inputs give it.
 - [ ] Every boundary case named in the inputs has its outcome stated.
 - [ ] Every combination of simultaneous operations the interfaces allow is
       covered (outcome or guarantee that it does not occur).
@@ -24,13 +29,14 @@ that do not, with the reason.
 - [ ] Names, terms and numbers are the same in text, tables and figures.
 - [ ] No chapter contradicts another.
 
-## Level and length
+## Diagram level and length
 
-- [ ] No implementation detail beyond the "in the HLS" column of
-      `03-content.md`.
-- [ ] The page count is within `page_budget`, or the user approved the
-      exception.
-- [ ] No architecture is repeated: later figures are behavioural.
+- [ ] Every diagram follows the chosen level (`05-diagram-levels.md`).
+- [ ] The text is complete regardless of the diagram level.
+- [ ] The page count is at most `page_budget.max`, or the user approved
+      the reported minimum length.
+- [ ] No content was left out to fit the page maximum without the user's
+      approval.
 
 ## Form
 

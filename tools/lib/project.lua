@@ -5,6 +5,12 @@ return function(U, Y, I)
 
   P.APPROACHES = U.set({ "design-info", "rtl" })
 
+  -- document_type -> defaults; high-level-spec is the name used by 0.2.
+  P.TYPES = {
+    ["design-spec"] = { subtitle = "Design Specification", file = "_Design_Specification" },
+    ["high-level-spec"] = { subtitle = "High-Level Specification", file = "_High-Level_Specification" },
+  }
+
   function P.version(root) return U.trim(U.split(U.read(root .. "/VERSION"), "\n")[1]) end
 
   local function text(cfg, key, default)
@@ -33,7 +39,7 @@ return function(U, Y, I)
       combined = cfg.value["output.combined_markdown"] ~= false,
       title = text(cfg, "document.title"),
       short_name = text(cfg, "document.short_name"),
-      subtitle = text(cfg, "document.subtitle", "High-Level Specification"),
+      subtitle = text(cfg, "document.subtitle"),
       author = text(cfg, "document.author"),
       organization = text(cfg, "document.organization", ""),
       revision = text(cfg, "document.revision", "0.1"),
@@ -53,7 +59,10 @@ return function(U, Y, I)
     end
 
     local bad = {}
-    if p.type ~= "high-level-spec" then bad[#bad + 1] = "document_type must be high-level-spec (is '" .. p.type .. "')" end
+    local kind = P.TYPES[p.type]
+    if not kind then bad[#bad + 1] = "document_type must be design-spec (is '" .. p.type .. "')" end
+    kind = kind or P.TYPES["design-spec"]
+    p.subtitle = p.subtitle or kind.subtitle
     if not P.APPROACHES[p.approach] then bad[#bad + 1] = "approach must be design-info or rtl (is '" .. p.approach .. "')" end
     if p.approach == "rtl" and not p.rtl_top then bad[#bad + 1] = "inputs.rtl_top is empty (required for rtl)" end
     if not p.min_pages or not p.max_pages then bad[#bad + 1] = "page_budget.min and max must be numbers" end
@@ -69,7 +78,7 @@ return function(U, Y, I)
     if U.is_absolute(p.out) or not U.inside(p.out_dir, dir) then
       bad[#bad + 1] = "output.dir must be a folder inside the project"
     end
-    p.file_name = p.file_name or ((p.short_name or "Document") .. "_High-Level_Specification")
+    p.file_name = p.file_name or ((p.short_name or "Document") .. kind.file)
     if p.file_name:find('[/\\:*?"<>|%c]') or p.file_name:match("^%.") then
       bad[#bad + 1] = "output.file_name (or short_name) has characters a file name cannot have"
     end

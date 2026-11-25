@@ -8,7 +8,7 @@ default" where a default is given.
 ```yaml
 specforge_version: "0.2.1"        # framework version this project is built with
 
-document_type: high-level-spec    # only value supported now: high-level-spec
+document_type: design-spec        # design-spec (0.2 projects: high-level-spec)
 
 approach: design-info             # design-info | rtl
 
@@ -20,13 +20,13 @@ inputs:
 
 output:
   dir: output/                    # PDF and combined Markdown go here
-  file_name: ""                   # default: <short_name>_High-Level_Specification
+  file_name: ""                   # default: <short_name>_Design_Specification
   combined_markdown: true         # also write one complete Markdown file
 
 document:
   title: ""                       # full design name, e.g. "Example Unit (EXU)"
   short_name: ""                  # short name used in file names, e.g. "EXU"
-  subtitle: High-Level Specification
+  subtitle: Design Specification
   author: ""
   organization: ""                # optional; shown on the title page if given
   revision: "0.1"

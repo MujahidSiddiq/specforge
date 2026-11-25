@@ -19,7 +19,7 @@
 - [ ] For `rtl`: the RTL version (commit, tag or date) is recorded and the
       inventory was run.
 - [ ] Every extracted fact has a source and a state (confirmed or derived).
-- [ ] Every item of `shared/hls-information-checklist.md` is marked given,
+- [ ] Every item of `shared/information-checklist.md` is marked given,
       partly given or missing.
 - [ ] Contradictions, ambiguities and naming problems are listed as
       findings.

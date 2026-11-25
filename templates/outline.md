@@ -6,8 +6,9 @@ is made here first.
 
 | Item | Value |
 |---|---|
-| Document type | high-level-spec |
-| Page budget | <min> to <max> pages |
+| Document type | design-spec |
+| Diagram level | detailed / high-level |
+| Page maximum | <max> pages |
 | Estimated length | <pages> (see the estimate below) |
 | Status | Proposed / Approved on <date> |
 
@@ -40,6 +41,6 @@ IDs behind the section.
 
 ## Estimate
 
-Show the calculation of `guides/high-level-spec/rules/02-page-budget.md`
+Show the calculation of `guides/design-spec/rules/02-page-budget.md`
 with the counts used (major blocks, interface groups, behaviour chapters,
 worked examples, timing diagrams), and the budget-fitting steps applied.

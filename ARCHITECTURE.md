@@ -28,7 +28,7 @@
 | Orchestrator guide | `guides/orchestrator/` | Runs the workflow and names the guide of each step |
 | Intake guides | `guides/intake-design-info/`, `guides/intake-rtl/` | Analyze the inputs of one approach; produce the analysis report and the questions |
 | Shared rules | `shared/` | Clarification rules and the information checklist |
-| Document-type guide | `guides/high-level-spec/` | Outline, page budget, content and writing rules of a high-level specification |
+| Document-type guide | `guides/design-spec/` | Outline, page budget, content, diagram levels and acceptance of a design specification |
 | LaTeX guide | `guides/latex-document/` | How the PDF is produced and checked |
 | LaTeX template | `latex/` | Preamble, title page, TikZ style library |
 | Tool | `tools/`, started by `texlua tools/specforge.lua` or `specforge.sh` | Project setup, checks, build, RTL inventory, chat pack and unpack, doctor |

@@ -27,7 +27,7 @@ return function(U, P, I, F)
     local function add(rel) section(out, "<specforge>/" .. rel, U.read(root .. "/" .. rel)) end
     add("VERSION")
     add("guides/orchestrator/GUIDE.md")
-    for _, g in ipairs({ "intake-design-info", "intake-rtl", "high-level-spec", "latex-document" }) do
+    for _, g in ipairs({ "intake-design-info", "intake-rtl", "design-spec", "latex-document" }) do
       add("guides/" .. g .. "/GUIDE.md")
       for _, r in ipairs(U.list(root .. "/guides/" .. g .. "/rules", "%.md$")) do add("guides/" .. g .. "/rules/" .. r) end
     end

@@ -11,7 +11,7 @@ into the document itself.
 | Reads | `inputs.design_info` folder of `project.md` (all `*.md`, in name order) |
 | Writes | `<project>/analysis.md` (from `<specforge>/templates/analysis.md`) |
 | Writes | Questions in `<project>/clarifications.md` (from `<specforge>/templates/clarifications.md`) |
-| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/hls-information-checklist.md` |
+| Follows | `<specforge>/shared/clarification-rules.md`, `<specforge>/shared/information-checklist.md` |
 
 The input files are the user's: never edit, rename or reformat them.
 
@@ -33,7 +33,7 @@ The input files are the user's: never edit, rename or reformat them.
    rules, and record them.
 7. **Stop** for the user's answers. Update the report with each answer.
    When nothing blocks the outline, hand over to the outline step
-   (high-level-spec guide).
+   (design-spec guide).
 
 ## Progressive inputs
 

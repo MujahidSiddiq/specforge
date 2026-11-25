@@ -1,4 +1,4 @@
-# Information a high-level specification needs
+# Information a design specification needs
 
 Used by both intake guides to find what the inputs do not say. For each
 item, the analysis report records whether the inputs give it (with the
@@ -16,8 +16,7 @@ become questions.
 
 - [ ] The top-level module name.
 - [ ] The major blocks and, for each, its responsibility.
-- [ ] The hierarchy down to the level the HLS describes (usually two
-      levels below the top).
+- [ ] The hierarchy down to the leaf modules.
 - [ ] The main connections between the blocks, grouped by function.
 - [ ] Configuration parameters: meaning, default, allowed range or
       constraints.
