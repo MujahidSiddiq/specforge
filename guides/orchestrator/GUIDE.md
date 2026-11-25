@@ -21,11 +21,13 @@ Inside a guide, `rules/...` is relative to that guide.
 
 ## Starting a session
 
-1. **Find the project folder** the user means. If it has no `project.md`,
-   ask for the required values (approach, title, short name, author, input
-   path, RTL top module) and run `specforge new`. When you cannot run
-   commands, create the layout of `ARCHITECTURE.md` Section 6 yourself from
-   `config-templates/project.md`, `config-templates/style.md`,
+1. **Find the project.** Follow `START-HERE.md` steps 1 to 3: the
+   workspace with `project_rtl` and/or `project_description`, the settings
+   from the user's message (diagram level, page maximum, title, short name,
+   author, colours), and `specforge new`. An existing
+   `specforge_output/project.md` means the work has started. When you
+   cannot run commands, create the layout of `ARCHITECTURE.md` Section 6
+   yourself from `config-templates/project.md`, `config-templates/style.md`,
    `templates/revision-history.md`, `templates/clarifications.md`,
    `templates/status.md` and `styles/colour-record-template.md` (as
    `colour-record.md`).

@@ -21,7 +21,7 @@
 
 | Component | Location | Role |
 |---|---|---|
-| Configuration templates | `config-templates/` | Copied into each project: `project.md`, `style.md` |
+| Configuration templates | `config-templates/` | Copied into each project: `project.md` (approach, inputs, diagram level, page maximum, document information), `style.md` (colours by plain name, overrides) |
 | Style defaults | `styles/style-defaults.md` | Default value of every styled element |
 | Base style rules | `styles/colour-guide.md` | Rules for colour, typography, layout and components that every document follows |
 | Entry points | `START-HERE.md`, `SKILL.md`, `AGENTS.md`, `specforge-chat.md` | One set of rules for code agents, cowork and chat |
@@ -92,24 +92,32 @@ approved before it is made.
 Facts from RTL are marked "from RTL" until the user confirms them; the notes
 of the `rtl` approach can answer intent questions in advance.
 
-## 6. Project folder layout
+## 6. Workspace and project folder layout
 
 ```
-<project>/
-  project.md            configuration (from config-templates/)
-  style.md              style overrides (from config-templates/)
-  inputs/               design information or RTL (and notes)
-  status.md             current step, gates passed, next action (from templates/)
-  clarifications.md     question register (from templates/)
-  revision-history.md   revision table shown in the front matter (from templates/)
-  colour-record.md      colour specification record (from styles/)
-  analysis.md           analysis report of step 2
-  outline.md            approved outline and page budget
-  chapters/             Markdown chapters, one file per chapter
-  figures/              TikZ sources and exported SVG previews
-  build/                intermediate files (not tracked)
-  output/               PDF and combined Markdown
+<workspace>/
+  specforge/              the framework
+  project_rtl/            RTL (approach rtl)
+  project_description/    Markdown description (approach design-info; with
+                          RTL, the notes on purpose and intent)
+  project_colours.md      optional colours by plain name
+  specforge_output/       the project (specforge new):
+    project.md            configuration (from config-templates/)
+    style.md              colours and style overrides (from config-templates/)
+    status.md             current step, gates passed, next action
+    clarifications.md     question register
+    revision-history.md   revision table shown in the front matter
+    colour-record.md      colour specification record
+    analysis.md           analysis report of step 2
+    outline.md            approved outline and page estimate
+    chapters/             Markdown chapters, one file per chapter
+    figures/              TikZ sources and exported SVG previews
+    build/                intermediate files (not tracked)
+    output/               PDF and combined Markdown
 ```
+
+A project may also name other input folders in `project.md`; the input
+folders are always separate from the project.
 
 ## 7. Extending specforge
 

@@ -1,7 +1,7 @@
 # Style defaults
 
 The default value of every styled element of a specforge document. The
-values reproduce the reference high-level specification that specforge was
+values reproduce the reference specification that specforge was
 derived from, and they follow the rules of `colour-guide.md`.
 
 A project changes any value by naming its key, with the same nesting, in the

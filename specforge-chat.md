@@ -2,8 +2,9 @@
 
 # specforge for a chat assistant
 
-The user uploaded this file so that you write a high-level specification
-(10 to 15 pages) of a hardware design with the specforge method. You cannot
+The user uploaded this file so that you write a design specification of a
+hardware design with the specforge method. `project.md` in the pack gives
+the diagram level and the page maximum. You cannot
 run commands or write files: the user does both, with your output. All the
 framework files you need are included below; use them as your instructions.
 
@@ -112,11 +113,13 @@ Inside a guide, `rules/...` is relative to that guide.
 
 ## Starting a session
 
-1. **Find the project folder** the user means. If it has no `project.md`,
-   ask for the required values (approach, title, short name, author, input
-   path, RTL top module) and run `specforge new`. When you cannot run
-   commands, create the layout of `ARCHITECTURE.md` Section 6 yourself from
-   `config-templates/project.md`, `config-templates/style.md`,
+1. **Find the project.** Follow `START-HERE.md` steps 1 to 3: the
+   workspace with `project_rtl` and/or `project_description`, the settings
+   from the user's message (diagram level, page maximum, title, short name,
+   author, colours), and `specforge new`. An existing
+   `specforge_output/project.md` means the work has started. When you
+   cannot run commands, create the layout of `ARCHITECTURE.md` Section 6
+   yourself from `config-templates/project.md`, `config-templates/style.md`,
    `templates/revision-history.md`, `templates/clarifications.md`,
    `templates/status.md` and `styles/colour-record-template.md` (as
    `colour-record.md`).
@@ -2057,7 +2060,7 @@ One line per session or step, newest last: date, what was done.
 # Style defaults
 
 The default value of every styled element of a specforge document. The
-values reproduce the reference high-level specification that specforge was
+values reproduce the reference specification that specforge was
 derived from, and they follow the rules of `colour-guide.md`.
 
 A project changes any value by naming its key, with the same nesting, in the
@@ -2353,7 +2356,7 @@ specforge check <project>
 - `check` writes only the combined Markdown and runs no LaTeX.
 
 Requirements: LuaLaTeX, which includes `texlua`; `pdftocairo` for the
-previews; the fonts named in the style. See `docs/install.md`.
+previews; the fonts named in the style. See `USER-GUIDE.md`.
 
 ## What the build does
 

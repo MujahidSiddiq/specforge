@@ -15,7 +15,7 @@ specforge check <project>
 - `check` writes only the combined Markdown and runs no LaTeX.
 
 Requirements: LuaLaTeX, which includes `texlua`; `pdftocairo` for the
-previews; the fonts named in the style. See `docs/install.md`.
+previews; the fonts named in the style. See `USER-GUIDE.md`.
 
 ## What the build does
 

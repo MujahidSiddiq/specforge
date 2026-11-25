@@ -1,7 +1,8 @@
 # specforge for a chat assistant
 
-The user uploaded this file so that you write a high-level specification
-(10 to 15 pages) of a hardware design with the specforge method. You cannot
+The user uploaded this file so that you write a design specification of a
+hardware design with the specforge method. `project.md` in the pack gives
+the diagram level and the page maximum. You cannot
 run commands or write files: the user does both, with your output. All the
 framework files you need are included below; use them as your instructions.
 

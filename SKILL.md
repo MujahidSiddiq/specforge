@@ -1,6 +1,6 @@
 ---
 name: specforge
-description: Write a high-level specification (10-15 page PDF) of a hardware design from Markdown design information or from RTL, with clarification questions and approval gates. Use when the user asks for specforge, or asks to continue a folder that has a specforge project.md.
+description: Write a complete design specification (PDF) of a hardware design from RTL or from a Markdown description, with detailed or high-level diagrams, state machine diagrams, a page maximum, custom colours, clarification questions and approval gates. Use when the user asks for specforge, or asks to continue a folder that has specforge_output or a specforge project.md.
 ---
 
 # specforge
