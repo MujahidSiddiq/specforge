@@ -72,6 +72,11 @@ local function configuration()
     U.write(dir .. "/project.md", base)
     return function() P.load(ROOT, dir, true) end
   end
+  local function style_raw(text)
+    local dir = fixture()
+    U.write(dir .. "/style.md", "```yaml\n" .. text .. "\n```\n")
+    return function() S.make(ROOT, dir) end
+  end
   local function style(yaml)
     local dir = fixture()
     U.write(dir .. "/style.md", "```yaml\noverrides:\n" .. yaml .. "\n```\n")
@@ -110,6 +115,36 @@ local function configuration()
   refuses("separator injection", style("  captions:\n    label_separator: 'x}\\input{y}'"))
   refuses("unknown style key", style("  colour:\n    no_such_key: 1"))
   test("accent override", pcall(style("  colour:\n    accent_primary: '#2F5D8A'")))
+
+  -- colours by plain name, and element colours as #RRGGBB
+  local function styled(text)
+    local dir = fixture()
+    U.write(dir .. "/style.md", "```yaml\n" .. text .. "\n```\n")
+    return dir
+  end
+  local plain = styled("colours:\n  block_fill: '#EAF1F8'\n  waveform: '#123456'\n  state_fill: '#FFF2CC'\noverrides: {}")
+  local ok, st = pcall(S.make, ROOT, plain)
+  test("plain colour names", ok and st.value["diagrams.block.fill"] == "#EAF1F8" and st.value["timing.signal_colour"] == "#123456",
+    not ok and (type(st) == "table" and st.specforge or st) or nil)
+  test("element colour defined", ok and st.files["sf-setup.tex"]:find("{sfcDiagramsBlockFill}{HTML}{EAF1F8}", 1, true)
+    and st.files["sf-config.tex"]:find("\\def\\sfDiagramsBlockFill{sfcDiagramsBlockFill}", 1, true))
+  test("element colours are contrast-checked", ok and #st.failed == 0 and st.summary:find("34 of 34", 1, true), ok and st.summary)
+  local function fails(name, text)
+    local ok2, st2 = pcall(S.make, ROOT, styled(text))
+    test(name, ok2 and #st2.failed > 0, ok2 and st2.summary or (type(st2) == "table" and st2.specforge or st2))
+  end
+  fails("unreadable block fill fails", "colours:\n  block_fill: '#30343A'\noverrides: {}")
+  fails("faint waveform fails", "colours:\n  waveform: '#E0E0E0'\noverrides: {}")
+  fails("dark page with dark text fails", "colours:\n  background: '#101010'\noverrides: {}")
+  refuses("unknown plain name", style_raw("colours:\n  sky: '#FFFFFF'\noverrides: {}"))
+  refuses("plain name and override together", style_raw("colours:\n  text: '#111111'\noverrides:\n  colour:\n    text_primary: '#222222'"))
+  refuses("plain colour not hex", style_raw("colours:\n  text: 'blue'\noverrides: {}"))
+  refuses("unknown top-level group", style_raw("colour:\n  text: '#111111'"))
+  test("dark theme with light text passes", pcall(S.make, ROOT, styled(
+    "colours:\n  background: '#14181C'\n  light_background: '#20262C'\n  text: '#E8EDF0'\n  secondary_text: '#B8C2C8'\n"
+    .. "  lines: '#8A969E'\n  light_lines: '#3A444C'\n  accent: '#6FBF94'\n  block_fill: '#14181C'\n  state_fill: '#20262C'\n"
+    .. "overrides:\n  colour:\n    accent_subtle: '#22332A'\n    warn_fg: '#F0B85A'\n    warn_bg: '#2E2615'\n    info_fg: '#8CC0F0'\n"
+    .. "    info_bg: '#16222E'\n    error_fg: '#F08C8C'\n    error_bg: '#2E1616'\n  callouts:\n    note:\n      fill: bg_subtle")))
 end
 
 local function figures()

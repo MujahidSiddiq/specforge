@@ -8,6 +8,11 @@
 --   sf-setup.tex    geometry, colours, fonts, captions, PDF properties
 --   style-report.md overrides, derived colours, contrast checks
 --
+-- Colours can be given three ways in style.md:
+--   colours:    plain names (text, block_fill, waveform ...), see PLAIN
+--   overrides:  colour tokens (colour.text_primary ...) or any element key
+--               (diagrams.block.fill ...), as a token name or #RRGGBB
+--
 -- style.md may come from another person or another AI, so every value that
 -- reaches LaTeX unescaped is checked against what it may contain.
 
@@ -42,6 +47,46 @@ return function(U, Y, C)
     { "accent_primary", "accent_subtle", 3.0, "Highlighted entry outline" },
   }
 
+  -- Plain colour names of style.md -> the key they set.
+  local PLAIN = {
+    text = "colour.text_primary", secondary_text = "colour.text_secondary",
+    background = "colour.bg_page", light_background = "colour.bg_subtle",
+    lines = "colour.border_strong", light_lines = "colour.border_subtle",
+    accent = "colour.accent_primary", headings = "headings.colour", captions = "captions.colour",
+    table_header = "tables.header_fill",
+    block_fill = "diagrams.block.fill", block_border = "diagrams.block.draw",
+    boundary_fill = "diagrams.boundary.fill", boundary_border = "diagrams.boundary.draw",
+    wires = "diagrams.wire.colour", highlight = "diagrams.highlight.colour",
+    waveform = "timing.signal_colour", clock = "timing.clock_colour", waveform_grid = "timing.grid_colour",
+    state_fill = "state_machines.state.fill", state_border = "state_machines.state.draw",
+    transitions = "state_machines.transition.colour", reset_arrow = "state_machines.reset.colour",
+  }
+  S.PLAIN = PLAIN
+
+  -- Element colours, checked as they are used (colour-guide.md Section 3.2).
+  -- A name without a dot is a colour token.
+  local ELEMENT_PAIRS = {
+    { "headings.colour", "bg_page", 4.5, "Headings" },
+    { "captions.colour", "bg_page", 4.5, "Captions" },
+    { "captions.label_colour", "bg_page", 4.5, "Caption labels" },
+    { "text_primary", "tables.header_fill", 4.5, "Table header text" },
+    { "text_primary", "callouts.note.fill", 4.5, "Highlighted statement" },
+    { "callouts.open_point.label_colour", "callouts.open_point.fill", 4.5, "OPEN POINT label" },
+    { "text_primary", "diagrams.block.fill", 4.5, "Block names" },
+    { "text_primary", "diagrams.boundary.fill", 4.5, "Labels inside the boundary" },
+    { "diagrams.block.draw", "diagrams.boundary.fill", 3.0, "Block outlines" },
+    { "diagrams.boundary.draw", "bg_page", 3.0, "Boundary outline" },
+    { "diagrams.wire.colour", "bg_page", 3.0, "Wires" },
+    { "diagrams.wire.colour", "diagrams.boundary.fill", 3.0, "Wires inside the boundary" },
+    { "diagrams.highlight.colour", "diagrams.boundary.fill", 3.0, "Highlighted path" },
+    { "timing.signal_colour", "bg_page", 3.0, "Waveforms" },
+    { "timing.clock_colour", "bg_page", 3.0, "Clock waveform" },
+    { "text_primary", "state_machines.state.fill", 4.5, "State names" },
+    { "state_machines.state.draw", "bg_page", 3.0, "State outlines" },
+    { "state_machines.transition.colour", "bg_page", 3.0, "Transitions" },
+    { "state_machines.reset.colour", "bg_page", 3.0, "Reset entry" },
+  }
+
   local HF_WORDS = {
     title = "\\DocTitle", short_name = "\\DocShortTitle", chapter = "\\leftmark",
     page = "\\thepage", none = "",
@@ -51,9 +96,38 @@ return function(U, Y, C)
     title = "\\DocTitle{}", short_name = "\\DocShortTitle{}", page = "\\thepage{}",
   }
 
+  local function plain_names(over, errors)
+    local any = false
+    for path in pairs(over.group) do
+      if path:match("^colours%.") then errors[#errors + 1] = "'" .. path .. "' must be a colour, not a group" end
+    end
+    for _, path in ipairs(over.order) do
+      local name = path:match("^colours%.(.+)$")
+      if name then
+        local key = PLAIN[name]
+        if not key then
+          local names = {}
+          for n in pairs(PLAIN) do names[#names + 1] = n end
+          table.sort(names)
+          errors[#errors + 1] = "unknown colour name '" .. name .. "' (names: " .. table.concat(names, ", ") .. ")"
+        elseif over.value["overrides." .. key] ~= nil then
+          errors[#errors + 1] = "colours." .. name .. " and overrides." .. key .. " set the same colour"
+        else
+          over.value["overrides." .. key] = over.value[path]
+          over.order[#over.order + 1] = "overrides." .. key
+          any = true
+        end
+      elseif not path:match("^overrides%.") then
+        errors[#errors + 1] = "'" .. path .. "' is not allowed: use colours or overrides"
+      end
+    end
+    return any
+  end
+
   local function merge(def, over, errors)
     local v, changed = {}, {}
     for k, x in pairs(def.value) do v[k] = x end
+    plain_names(over, errors)
     for path in pairs(over.group) do
       local key = path:match("^overrides%.(.+)$")
       if key and not def.group[key] then
@@ -96,7 +170,9 @@ return function(U, Y, C)
           errors[#errors + 1] = key .. " must be one of: " .. table.concat(CHOICES[key], ", ")
         end
       elseif type(base) == "string" and def.value["colour." .. base] ~= nil then
-        if def.value["colour." .. x] == nil then errors[#errors + 1] = key .. " must name a colour token" end
+        if def.value["colour." .. x] == nil and not x:match("^#%x%x%x%x%x%x$") then
+          errors[#errors + 1] = key .. " must be #RRGGBB or the name of a colour token"
+        end
       end
     end
     local size = v["page.class_font_size_pt"]
@@ -155,8 +231,18 @@ return function(U, Y, C)
     return "sf" .. table.concat(out)
   end
 
+  -- A #RRGGBB element colour is defined as its own colour, named after its key.
+  local function own_colour(key) return "sfc" .. macro_name(key):sub(3) end
+
+  local function hex_of(v, name)
+    local x = name:find(".", 1, true) and v[name] or name
+    if type(x) == "string" and x:match("^#") then return x end
+    return v["colour." .. x]
+  end
+
   local function text_value(v, key, x)
     if v["colour." .. x] ~= nil then return (x:gsub("_", "")) end
+    if x:match("^#%x%x%x%x%x%x$") then return own_colour(key) end
     if key:match("^header_footer%.header_[lr]") and key:match("_[a-z]+$") and not key:match("_rule")
       or key:match("^header_footer%.footer_[lr]") and not key:match("_rule") then
       if HF_WORDS[x] then return HF_WORDS[x] end
@@ -228,6 +314,12 @@ return function(U, Y, C)
         out[#out + 1] = string.format("\\definecolor{%s}{HTML}{%s}   %% %s", (token:gsub("_", "")), v[key]:sub(2):upper(), token)
       end
     end
+    for _, key in ipairs(def.order) do
+      local x = v[key]
+      if not key:match("^colour%.") and type(x) == "string" and x:match("^#%x%x%x%x%x%x$") then
+        out[#out + 1] = string.format("\\definecolor{%s}{HTML}{%s}   %% %s", own_colour(key), x:sub(2):upper(), key)
+      end
+    end
     out[#out + 1] = "\\pagecolor{bgpage}"
     out[#out + 1] = "\\color{textprimary}"
     local main = { { "UprightFont", "main_upright" }, { "ItalicFont", "main_italic" },
@@ -240,8 +332,8 @@ return function(U, Y, C)
       { { "UprightFont", "heading_upright" }, { "BoldFont", "heading_upright" }, { "ItalicFont", "heading_italic" } })
     out[#out + 1] = string.format(
       "\\captionsetup{font={%s,color=%s},labelfont={%scolor=%s},labelsep=%s,justification=RaggedRight,singlelinecheck=false,skip=%spt}",
-      v["captions.font_size"], (v["captions.colour"]:gsub("_", "")), v["captions.label_bold"] and "bf," or "",
-      (v["captions.label_colour"]:gsub("_", "")), v["captions.label_separator"], n(v["captions.skip_pt"]))
+      v["captions.font_size"], text_value(v, "captions.colour", v["captions.colour"]), v["captions.label_bold"] and "bf," or "",
+      text_value(v, "captions.label_colour", v["captions.label_colour"]), v["captions.label_separator"], n(v["captions.skip_pt"]))
     out[#out + 1] = string.format(
       "\\hypersetup{hidelinks=%s,pdftitle={\\DocTitle{} --- \\DocSubtitle},pdfauthor={\\DocAuthor},pdfsubject={\\DocSubtitle},pdflang={\\DocLanguage},pdfdisplaydoctitle=%s,bookmarksnumbered=%s}",
       tostring(v["pdf.hide_links"]), tostring(v["pdf.display_title"]), tostring(v["pdf.bookmarks_numbered"]))
@@ -272,19 +364,24 @@ return function(U, Y, C)
     report[#report + 1] = "| Use | Foreground | Background | Ratio | Required | Result |"
     report[#report + 1] = "|---|---|---|---:|---:|---|"
     local failed = {}
-    for _, p in ipairs(PAIRS) do
-      local fg, bg = v["colour." .. p[1]], v["colour." .. p[2]]
-      local r = C.contrast(fg, bg)
-      if r < p[3] then failed[#failed + 1] = string.format("%s on %s: %.2f < %s", p[1], p[2], r, U.num(p[3])) end
-      report[#report + 1] = string.format("| %s | `%s` %s | `%s` %s | %.2f | %s | %s |",
-        p[4], p[1], fg, p[2], bg, r, U.num(p[3]), r >= p[3] and "pass" or "FAIL")
+    local checked = 0
+    for _, list in ipairs({ PAIRS, ELEMENT_PAIRS }) do
+      for _, p in ipairs(list) do
+        local fg, bg = hex_of(v, p[1]), hex_of(v, p[2])
+        if not fg or not bg then U.fail("internal: unknown style key in a contrast pair: %s / %s", p[1], p[2]) end
+        local r = C.contrast(fg, bg)
+        checked = checked + 1
+        if r < p[3] then failed[#failed + 1] = string.format("%s on %s: %.2f < %s", p[1], p[2], r, U.num(p[3])) end
+        report[#report + 1] = string.format("| %s | `%s` %s | `%s` %s | %.2f | %s | %s |",
+          p[4], p[1], fg, p[2], bg, r, U.num(p[3]), r >= p[3] and "pass" or "FAIL")
+      end
     end
 
     return {
       value = v,
       failed = failed,
       summary = string.format("Style: %d override(s), %d derived token(s), %d of %d contrast pairs pass.",
-        #changed, derived, #PAIRS - #failed, #PAIRS),
+        #changed, derived, checked - #failed, checked),
       files = {
         ["sf-class.tex"] = string.format("\\documentclass[%dpt,%spaper,oneside]{report}\n",
           math.floor(v["page.class_font_size_pt"]), v["page.paper"]),

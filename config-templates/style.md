@@ -1,37 +1,65 @@
-# Style overrides
+# Style
 
-Copy this file into the project folder. Leave the `overrides` block empty to
-use the default style.
-
-To change a value, copy its key from `styles/style-defaults.md` into the
-block below, keeping the same nesting, and set the new value. Only the keys
-you write are changed; every other key keeps its default.
+Leave both blocks empty to use the default style. Only what you write is
+changed; everything else keeps its default.
 
 ```yaml
+colours: {}
 overrides: {}
 ```
 
-## Example
+## Colours by plain name
 
-This example changes only the accent colour and the base font size; every
-other value stays at its default:
+Write `#RRGGBB` values under `colours`, replacing `colours: {}`:
 
 ```yaml
+colours:
+  text: "#1B1F24"
+  background: "#FFFFFF"
+  accent: "#2F5D8A"
+  block_fill: "#EAF1F8"
+  block_border: "#4A5A6A"
+  waveform: "#1B1F24"
+  state_fill: "#EAF1F8"
+overrides: {}
+```
+
+| Name | Colours |
+|---|---|
+| `text`, `secondary_text` | Body text; captions, header, footer, wires and sub-labels |
+| `background`, `light_background` | Page; table headers and the top-level boundary |
+| `lines`, `light_lines` | Outlines and table rules; decorative rules |
+| `accent` | Chapter rule and highlights (the related accent tones follow it) |
+| `headings`, `captions`, `table_header` | Headings; caption text; table header fill |
+| `block_fill`, `block_border` | Blocks in block diagrams |
+| `boundary_fill`, `boundary_border` | The top-level boundary |
+| `wires`, `highlight` | Connections; a highlighted path |
+| `waveform`, `clock`, `waveform_grid` | Timing diagrams |
+| `state_fill`, `state_border`, `transitions`, `reset_arrow` | State machines |
+
+## Any other value
+
+Copy a key from `styles/style-defaults.md` into `overrides`, with the same
+nesting. A colour value is `#RRGGBB` or the name of a colour token.
+
+```yaml
+colours: {}
 overrides:
-  colour:
-    accent_primary: "#2F5D8A"
   page:
     class_font_size_pt: 12
+  diagrams:
+    wire:
+      line_pt: 1.0
 ```
 
 ## Rules
 
-- A colour override must still meet the contrast rules of
-  `styles/colour-guide.md` (Part II). The assistant checks this and reports
-  any pair that fails before building.
-- When the accent colour changes, the derived accent tokens
-  (`accent_strong`, `accent_subtle`, `accent_secondary`) are derived again
-  as described in `styles/colour-guide.md`, Section 6.1, unless they are
-  overridden as well.
+- Every colour must keep text and lines readable: the build checks the
+  contrast of each pair of foreground and background (colour-guide.md
+  Section 3.2) and stops with the pair that fails. Choose a darker or
+  lighter colour then; the check cannot be switched off.
+- When `accent` changes, its lighter and darker tones are derived from it,
+  unless they are set too.
+- The same colour may not be set both by plain name and in `overrides`.
 - A font override names an installed OpenType font family.
-- An unknown key or a value of the wrong kind is an error.
+- An unknown name or key, or a value of the wrong kind, is an error.

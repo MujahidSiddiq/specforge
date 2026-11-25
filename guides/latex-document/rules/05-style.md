@@ -17,9 +17,13 @@ generates the LaTeX style files. Nothing else defines a style value.
    values, font commands, font sizes or spacing in `chapters/` or
    `figures/`. Use the Markdown constructs and the TikZ styles; they take
    their values from the style keys.
-2. **Change the look through `style.md`.** To change a value, add its key
-   under `overrides`, with the same nesting as in `style-defaults.md`. Do
-   not edit `style-defaults.md` for one project.
+2. **Change the look through `style.md`.** Colours by plain name go under
+   `colours` (the names are in `config-templates/style.md`); every other
+   value goes under `overrides`, with the same nesting as in
+   `style-defaults.md`. Do not edit `style-defaults.md` for one project.
+   When the user gives a colour scheme in another form (a list, a file, a
+   brand guide), translate it into these names, show the result, and ask
+   about any colour that has no clear place.
 3. **A user's request for a different look is an override.** Record it in
    `style.md` and mention it in `clarifications.md`; confirm the exact
    values with the user if the request is not exact ("a bit larger").

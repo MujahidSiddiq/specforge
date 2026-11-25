@@ -10,10 +10,13 @@ values below. The build turns the merged values into the
 LaTeX style files, so these keys are the only place where a style value is
 defined.
 
-Units are part of the key name (`_pt`, `_mm`). Colours are `#RRGGBB` and
-always refer to a token of the `colour` group by name (for example
-`text_primary`) everywhere else, so that changing a token changes every
-element that uses it.
+Units are part of the key name (`_pt`, `_mm`). The tokens of the `colour`
+group are `#RRGGBB`. Every other colour refers to a token by name (for
+example `text_primary`), so that changing a token changes every element
+that uses it; a project may instead give one element its own `#RRGGBB`.
+Plain colour names for the common elements are listed in
+`config-templates/style.md`. Every foreground and background pair is
+contrast-checked on each build.
 
 ```yaml
 page:
